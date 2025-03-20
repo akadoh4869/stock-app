@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StockController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,3 +21,12 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/top', [StockController::class, 'index'])->name('stock.index');
+    Route::get('/stock/switch-space/{type}/{groupId?}', [StockController::class, 'switchSpace'])->name('stock.switch.space');
+});
+
+Route::get('/top',function(){
+    return view('/users/top');
+});
