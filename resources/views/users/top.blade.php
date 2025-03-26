@@ -4,96 +4,95 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="{{ asset('css/users/top.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <title>トップページ</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        .group-list {
-            list-style: none;
-            padding: 0;
-        }
-        .group-list li {
-            margin: 10px 0;
-        }
-        .category-list {
-            list-style: none;
-            padding: 0;
-            border: 2px solid purple;
-            display: inline-block;
-            padding: 10px;
-        }
-        .category-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px dotted #999;
-            padding: 5px;
-        }
-        .category-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-    </style>
 </head>
 <body>
 
-    @if(isset($user))
-        <h2>{{ $user->user_name }}</h2>
-    @endif
+     <!-- ▼ 現在のスペース名（クリックで切り替えメニュー表示） -->
+    <div id="space-selector" style="cursor: pointer; display: inline-block;">
+        <h2 style="display: inline;">
+            {{ $currentType === 'group' && isset($currentGroup) ? $currentGroup->name . ' グループ' : $user->user_name }}
+            <i class="fa fa-chevron-down"></i>
+        </h2>
+    </div>
 
+   
+    <!-- ▼ スペース切り替えメニュー -->
+    <div id="space-menu" style="display: none; margin-bottom: 20px;">
+        <!-- 個人スペース -->
+        <form method="POST" action="{{ route('stock.switch', ['type' => 'personal']) }}">
+            @csrf
+            <button type="submit"
+                style="{{ $currentType === 'personal' ? 'font-weight: bold;' : '' }}">
+                {{ $user->user_name }}
+            </button>
+        </form>
+
+        <!-- グループスペース一覧 -->
+        @foreach ($groups as $group)
+            <form method="POST" action="{{ route('stock.switch', ['type' => 'group', 'groupId' => $group->id]) }}">
+                @csrf
+                <button type="submit"
+                    style="{{ $currentType === 'group' && $currentGroup && $group->id === $currentGroup->id ? 'font-weight: bold;' : '' }}">
+                    {{ $group->name }} 
+                </button>
+            </form>
+        @endforeach
+
+        <!-- ✅ 合計スペース数が5未満のときに表示 -->
+        @if($groups->count() + 1 < 5)
+            <button onclick="window.location.href='/create-group'" style="margin-top: 10px; font-weight: bold;">
+                ＋ スペースを追加
+            </button>
+        @endif
+    </div>
+
+    <h3>在庫カテゴリ</h3>
+
+    <!-- ✅ 一括作成ボタン -->
+    <div style="margin-bottom: 10px;">
+        <button onclick="window.location.href='/category-bulk-create'">
+            カテゴリ＋アイテム一括作成
+        </button>
+    </div>
     
-    <p>現在のスペース: 
-        <strong>
-            @if(isset($currentType) && $currentType === 'personal')
-                個人スペース
-            @else
-                {{ $currentGroup->name ?? 'なし' }}
-            @endif
-        
-        </strong>
-    </p>
-
-    <p>スペースを切り替え:</p>
-    <ul class="group-list">
-        <li>
-            <a href="{{ route('stock.switch.space', ['type' => 'personal']) }}" 
-                style="{{ isset($currentType) && $currentType === 'personal' ? 'font-weight: bold;' : '' }}">
-                個人スペース
-            </a>
-        </li>
-        @if(isset($groups) && $groups->isNotEmpty())
-            @foreach($groups as $group)
-                <li>
-                    <a href="{{ route('stock.switch.space', ['type' => 'group', 'groupId' => $group->id]) }}" 
-                    style="{{ isset($currentType) && $currentType === 'group' && isset($currentGroup) && $group->id == $currentGroup->id ? 'font-weight: bold;' : '' }}">
-                        {{ $group->name }}
+    @if(isset($categories) && count($categories) > 0)
+        <ul class="category-list">
+            @foreach($categories as $category)
+                <li class="category-item">
+                    <div class="category-dot" style="background-color: {{ $loop->index % 2 == 0 ? 'pink' : 'cyan' }};"></div>
+                    
+                    <!-- ✅ カテゴリ名をクリックで遷移 -->
+                    <a href="{{ route('category.items', ['id' => $category->id]) }}">
+                        {{ $category->name }}（{{ $category->items->count() }}）
                     </a>
                 </li>
             @endforeach
-        @else
-            <li>グループがありません</li>
-        @endif
+        </ul>
+    @endif
 
     
-    </ul>
-
-    <h3>在庫カテゴリ</h3>
-    @if(isset($categories) && count($categories) > 0)
-    <ul class="category-list">
-        @foreach($categories as $category)
-            <li class="category-item">
-                <div class="category-dot" style="background-color: {{ $loop->index % 2 == 0 ? 'pink' : 'cyan' }};"></div>
-                {{ $category->name }}（{{ $category->items->count() }}）
-            </li>
-        @endforeach
-    </ul>
-@else
-    <p>カテゴリがありません</p>
-@endif
+    <!-- ✅ カテゴリ追加（5つ未満のとき） -->
+    @if(!isset($categories) || count($categories) < 5)
+        <div id="category-add-section" style="margin-top: 10px;">
+            <button id="show-category-input" style="font-weight: bold;">
+                ＋ カテゴリを追加
+            </button>
+    
+            <!-- 入力フォーム（初期は非表示） -->
+            <form id="category-form" action="{{ route('category.store') }}" method="POST" style="display: none; margin-top: 10px;">
+                @csrf
+                <input type="text" name="name" placeholder="カテゴリ名" required>
+                <input type="hidden" name="inventory_id" value="{{ $inventory->id }}">
+                <button type="submit">追加</button>
+            </form>
+        </div>
+    @endif
+    
+    
+    
 
 
     <br>
@@ -103,3 +102,18 @@
 
 </body>
 </html>
+
+<script>
+    document.getElementById('space-selector').addEventListener('click', function () {
+        const menu = document.getElementById('space-menu');
+        menu.style.display = (menu.style.display === 'none') ? 'block' : 'none';
+    });
+
+    document.getElementById('show-category-input')?.addEventListener('click', function () {
+        document.getElementById('category-form').style.display = 'block';
+        this.style.display = 'none'; // ボタン自体を隠す
+    });
+</script>
+
+
+
