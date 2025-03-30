@@ -71,3 +71,15 @@ body {
     border: 1px dashed #888;
     color: #444;
 }
+
+.popup {
+    position: fixed;
+    top: 20%;
+    left: 10%;
+    right: 10%;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 20px;
+    z-index: 1000;
+    box-shadow: 0 0 10px #999;
+}

@@ -1,0 +1,92 @@
+body {
+    font-family: sans-serif;
+    background-color: #f7f8fc;
+    padding: 20px;
+}
+
+.container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.group-name {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.group-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 18px;
+    border-radius: 20px;
+    border: 2px solid pink;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.item-box {
+    border: 2px solid #add8e6;
+    border-radius: 16px;
+    padding: 10px 15px;
+    margin-bottom: 16px;
+    position: relative;
+}
+
+.item-number {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    background: pink;
+    color: white;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    text-align: center;
+    line-height: 28px;
+    font-weight: bold;
+}
+
+.item-box input[type="text"],
+.item-box input[type="date"],
+.item-box input[type="number"] {
+    width: 100%;
+    margin: 4px 0;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.item-row {
+    margin-top: 8px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 24px;
+    background-color: pink;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.add-button {
+    background-color: #f99cc9;
+}
+
+.bottom-menu {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 30px;
+}
+
+.bottom-menu div {
+    text-align: center;
+}

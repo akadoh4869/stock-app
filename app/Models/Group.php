@@ -25,4 +25,10 @@ class Group extends Model
     {
         return $this->hasOne(Inventory::class);
     }
+   // Group.php
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'group_members', 'group_id', 'user_id');
+    }
+
 }
