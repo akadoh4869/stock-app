@@ -45,6 +45,15 @@
                         <label>購入日：</label>
                         <span>{{ $item->purchase_date ?? '未設定' }}</span>
                     </div>
+
+                    @if($currentType === 'group')
+                        <div class="item-row">
+                            <label>所有者：</label>
+                            <span>
+                                {{ $item->owner?->user_name ?? '共有' }}
+                            </span>
+                        </div>
+                    @endif
     
                     <div class="item-row">
                         <label>個数：</label>
