@@ -53,16 +53,24 @@ class CategoryController extends Controller
 
     public function showItems($id)
     {
-        $category = InventoryCategory::with('items.owner')->findOrFail($id); // ← ownerもEager Load
-
-        $currentType = session('current_type', 'personal'); // ← セッションから取得
-
+        $user = Auth::user();
+        $category = InventoryCategory::with(['items.owner'])->findOrFail($id);
+    
+        $currentType = session('current_type');
+        $currentGroupId = session('current_group_id');
+        $currentGroup = null;
+    
+        if ($currentType === 'group' && $currentGroupId) {
+            $currentGroup = $user->groups()->where('groups.id', $currentGroupId)->first();
+        }
+    
         return view('category.items', [
             'category' => $category,
             'items' => $category->items,
-            'currentType' => $currentType, // ← Bladeに渡す
+            'currentType' => $currentType,
+            'currentGroup' => $currentGroup, // ← 追加
         ]);
-    }
+    }    
 
     public function destroy($id)
     {
