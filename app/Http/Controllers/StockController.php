@@ -90,56 +90,54 @@ class StockController extends Controller
 
     public function store(Request $request)
     {
-        $user = Auth::user();
-        if (!$user) {
-            return redirect()->route('login')->with('error', 'ログインしてください');
-        }
-
-        $request->validate([
-            'category_name' => 'required|string|max:255',
-            'items' => 'required|array|min:1',
-            'items.*.name' => 'required|string|max:255',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.memo' => 'nullable|string',
-            'items.*.expiration_date' => 'nullable|date',
-            'items.*.purchase_date' => 'nullable|date',
-            'items.*.owner_id' => 'nullable|exists:users,id',
+        $data = $request->json()->all();
+    
+        $item = new InventoryItem();
+        $item->fill([
+            'name' => $data['name'] ?? '',
+            'expiration_date' => $data['expiration_date'] ?? null,
+            'purchase_date' => $data['purchase_date'] ?? null,
+            'quantity' => $data['quantity'] ?? 1,
+            'description' => $data['description'] ?? '',
+            'owner_id' => $data['owner_id'] ?? null,
+            'category_id' => $data['category_id'],
         ]);
-
-        $currentType = session('current_type');
-        $currentGroupId = session('current_group_id');
-
-        // 在庫を取得（個人 or グループ）
-        if ($currentType === 'personal') {
-            $inventory = Inventory::where('owner_id', $user->id)->firstOrFail();
-        } elseif ($currentType === 'group' && $currentGroupId) {
-            $inventory = Inventory::where('group_id', $currentGroupId)->firstOrFail();
-        } else {
-            return redirect()->back()->with('error', '在庫スペースが見つかりません');
-        }
-
-        // カテゴリ（group_name）を inventory_categories に登録（または取得）
-        $category = InventoryCategory::firstOrCreate([
-            'inventory_id' => $inventory->id,
-            'name' => $request->input('category_name'),
-        ]);
-
-        // アイテムを1つずつ inventory_items に登録
-        foreach ($request->input('items') as $item) {
-            InventoryItem::create([
-                'name' => $item['name'],
-                'quantity' => $item['quantity'],
-                'description' => $item['memo'] ?? null,
-                'purchase_date' => isset($item['has_purchase']) ? $item['purchase_date'] : null,
-                'expiration_date' => isset($item['has_expiration']) ? $item['expiration_date'] : null,
-                'category_id' => $category->id,
-                'owner_id' => $currentType === 'personal'
-                    ? $user->id
-                    : ($item['owner_id'] ?? null),
-            ]);
-        }
-
-        return redirect()->route('stock.index')->with('success', '在庫が登録されました');
+        $item->save();
+    
+        return response()->json(['message' => '作成成功', 'id' => $item->id]);
     }
+    
+
+    public function update(Request $request, InventoryItem $item)
+    {
+        $data = $request->json()->all(); // fetchからのJSONを受け取る
+    
+        $fields = ['name', 'expiration_date', 'purchase_date', 'quantity', 'description'];
+    
+        foreach ($fields as $field) {
+            if (array_key_exists($field, $data)) {
+                $item->$field = $data[$field];
+            }
+        }
+    
+        $item->save();
+    
+        return response()->json(['message' => '保存成功']);
+    }
+
+    public function destroy(InventoryItem $item)
+    {
+        $item->delete(); // ソフトデリート
+    
+        return response()->json(['message' => '削除成功']);
+    }
+
+    public function history()
+    {
+        $deletedItems = InventoryItem::onlyTrashed()->orderBy('deleted_at', 'desc')->get();
+        return view('items.history', compact('deletedItems'));
+    }
+    
+    
 
 }

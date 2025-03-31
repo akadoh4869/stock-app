@@ -38,8 +38,13 @@ Route::middleware(['auth'])->group(function () {
 
     // ✅ アイテム保存（StockControllerにて処理）
     Route::post('/item/store', [StockController::class, 'store'])->name('item.store');
+    Route::put('/items/{item}', [StockController::class, 'update'])->name('item.update');
 
     Route::delete('/category/{id}', [CategoryController::class, 'destroy'])->name('category.destroy');
+    Route::delete('/items/{item}', [StockController::class, 'destroy'])->name('item.destroy');
+
+    Route::get('/items/history', [StockController::class, 'history'])->name('item.history');
+
 
 
     // 招待ページ表示（検索）
@@ -50,6 +55,8 @@ Route::middleware(['auth'])->group(function () {
     // 退出
     // Route::post('/group/leave', [GroupController::class, 'leave'])->name('group.leave');
     Route::post('/group/{groupId}/leave', [GroupController::class, 'leave'])->name('group.leave');
+    
+
 
 
 

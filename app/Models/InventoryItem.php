@@ -11,6 +11,7 @@ class InventoryItem extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $dates = ['deleted_at'];
     protected $fillable = ['name', 'category_id', 'quantity', 'description', 'purchase_date', 'expiration_date', 'owner_id'];
 
     public function category()
