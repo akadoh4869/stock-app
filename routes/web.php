@@ -55,8 +55,19 @@ Route::middleware(['auth'])->group(function () {
     // 退出
     // Route::post('/group/leave', [GroupController::class, 'leave'])->name('group.leave');
     Route::post('/group/{groupId}/leave', [GroupController::class, 'leave'])->name('group.leave');
-    
 
+    // フォームを表示するルート（GET）
+    Route::get('/group/create', [GroupController::class, 'create'])->name('group.create.form');
+
+    // フォーム送信を処理するルート（POST）
+    Route::post('/group/create', [GroupController::class, 'store'])->name('group.create');
+
+
+    Route::delete('/inventory/{inventory}', [GroupController::class, 'destroy'])->name('inventory.destroy');
+
+    Route::delete('/category/{id}/force-delete', [CategoryController::class, 'forceDelete'])->name('category.forceDelete');
+
+    
 
 
 
