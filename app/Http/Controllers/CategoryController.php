@@ -37,19 +37,57 @@ class CategoryController extends Controller
 
     
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'inventory_id' => 'required|exists:inventories,id',
-        ]);
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'inventory_id' => 'required|exists:inventories,id',
+    ]);
 
-        InventoryCategory::create([
-            'name' => $request->name,
-            'inventory_id' => $request->inventory_id,
-        ]);
+    // カテゴリ作成
+    $category = InventoryCategory::create([
+        'name' => $request->name,
+        'inventory_id' => $request->inventory_id,
+    ]);
 
-        return redirect()->back()->with('success', 'カテゴリを追加しました');
+    if ($request->has('items')) {
+        foreach ($request->items as $index => $itemData) {
+            if (empty($itemData['name'])) {
+                continue;
+            }
+
+            $item = new InventoryItem([
+                'name' => $itemData['name'],
+                'expiration_date' => !empty($itemData['has_expiration']) ? $itemData['expiration_date'] ?? null : null,
+                'purchase_date' => !empty($itemData['has_purchase']) ? $itemData['purchase_date'] ?? null : null,
+                'quantity' => $itemData['quantity'] ?? 1,
+                'description' => $itemData['memo'] ?? '',
+                'owner_id' => $itemData['owner_id'] ?? null,
+                'category_id' => $category->id,
+            ]);
+            $item->save();
+
+            \Log::info('保存されたitemのID: ' . $item->id);
+
+            if (!$item->id) {
+                continue;
+            }
+
+            // ✅ 画像処理：items.0.image のような形で来るので、直接取得
+            $imageFile = $request->file("items.$index.image");
+            if ($imageFile && $imageFile->isValid()) {
+                $path = $imageFile->store('item_images', 'public');
+
+                InventoryItemImage::create([
+                    'item_id' => $item->id,
+                    'image_path' => $path,
+                ]);
+            }
+        }
     }
+
+    return redirect()->route('stock.index')->with('success', 'カテゴリを作成しました');
+}
+
 
     public function showItems($id)
     {
@@ -165,6 +203,23 @@ class CategoryController extends Controller
 
         return redirect()->route('category.history')->with('success', 'カテゴリとアイテムを完全に削除しました');
     }
+
+    public function historyByCategory($categoryId)
+    {
+        $category = InventoryCategory::withTrashed()->findOrFail($categoryId); // ← 修正点
+
+        $deletedItems = InventoryItem::onlyTrashed()
+            ->where('category_id', $categoryId)
+            ->get();
+
+        return view('category.history', [
+            'deletedCategories' => collect([$category]),
+            'currentCategoryCount' => 0,
+            'filteredItemOnly' => true,
+            'deletedItems' => $deletedItems,
+        ]);
+    }
+
 
 
 

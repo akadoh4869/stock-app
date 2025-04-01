@@ -68,6 +68,12 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/category/{id}/force-delete', [CategoryController::class, 'forceDelete'])->name('category.forceDelete');
 
     
+    Route::get('/history', [CategoryController::class, 'history'])->name('category.history');
+    Route::get('/history/{categoryId}', [CategoryController::class, 'historyByCategory'])->name('category.history.category');
+
+
+    Route::post('/item/{id}/restore', [StockController::class, 'restore'])->name('item.restore');
+    Route::delete('/item/{id}/force-delete', [StockController::class, 'forceDelete'])->name('item.forceDelete');
 
 
 

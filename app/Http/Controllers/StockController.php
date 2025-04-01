@@ -100,31 +100,53 @@ class StockController extends Controller
 
 
     public function store(Request $request)
-    {
-        $data = $request->json()->all();
-    
+{
+    $user = auth()->user();
+
+    // カテゴリ作成
+    $category = InventoryCategory::create([
+        'name' => $request->input('category_name'),
+        'inventory_id' => Inventory::where('owner_id', $user->id)->first()->id // ← 必要に応じて調整
+    ]);
+
+    // 各アイテム処理
+    foreach ($request->input('items', []) as $index => $itemData) {
+        if (empty($itemData['name'])) continue; // name がないアイテムは無視
+
         $item = new InventoryItem();
         $item->fill([
-            'name' => $data['name'] ?? '',
-            'expiration_date' => $data['expiration_date'] ?? null,
-            'purchase_date' => $data['purchase_date'] ?? null,
-            'quantity' => $data['quantity'] ?? 1,
-            'description' => $data['description'] ?? '',
-            'owner_id' => $data['owner_id'] ?? null,
-            'category_id' => $data['category_id'],
+            'name' => $itemData['name'],
+            'expiration_date' => !empty($itemData['has_expiration']) ? $itemData['expiration_date'] ?? null : null,
+            'purchase_date' => !empty($itemData['has_purchase']) ? $itemData['purchase_date'] ?? null : null,
+            'quantity' => $itemData['quantity'] ?? 1,
+            'description' => $itemData['memo'] ?? '',
+            'owner_id' => $itemData['owner_id'] ?? null,
+            'category_id' => $category->id,
         ]);
         $item->save();
-    
-        return response()->json(['message' => '作成成功', 'id' => $item->id]);
+
+        // 画像があれば保存
+        $imageKey = "items.$index.image"; // フォームから送られたファイル名と一致
+        if ($request->hasFile($imageKey)) {
+            $path = $request->file($imageKey)->store('item_images', 'public');
+
+            \App\Models\InventoryItemImage::create([
+                'inventory_item_id' => $item->id,
+                'image_path' => $path,
+            ]);
+        }
     }
-    
+
+    return redirect()->route('stock.index')->with('success', 'カテゴリとアイテムを作成しました');
+}
+
 
     public function update(Request $request, InventoryItem $item)
     {
         $data = $request->json()->all(); // fetchからのJSONを受け取る
     
-        $fields = ['name', 'expiration_date', 'purchase_date', 'quantity', 'description'];
-    
+        $fields = ['name', 'expiration_date', 'purchase_date', 'quantity', 'description', 'owner_id'];
+
         foreach ($fields as $field) {
             if (array_key_exists($field, $data)) {
                 $item->$field = $data[$field];
@@ -147,6 +169,22 @@ class StockController extends Controller
     {
         $deletedItems = InventoryItem::onlyTrashed()->orderBy('deleted_at', 'desc')->get();
         return view('items.history', compact('deletedItems'));
+    }
+    
+    public function restore($id)
+    {
+        $item = InventoryItem::onlyTrashed()->findOrFail($id);
+        $item->restore();
+    
+        return back()->with('success', 'アイテムを復元しました');
+    }
+    
+    public function forceDelete($id)
+    {
+        $item = InventoryItem::onlyTrashed()->findOrFail($id);
+        $item->forceDelete();
+    
+        return back()->with('success', 'アイテムを完全に削除しました');
     }
     
     
