@@ -90,11 +90,11 @@ class CategoryController extends Controller
     public function history()
     {
         $user = Auth::user();
-    
+
         // セッションから現在のスペース情報を取得
         $currentType = session('current_type');
         $currentGroupId = session('current_group_id');
-    
+
         // 在庫情報を取得（個人 or グループ）
         if ($currentType === 'personal') {
             $inventory = Inventory::where('owner_id', $user->id)
@@ -106,27 +106,39 @@ class CategoryController extends Controller
         } else {
             $inventory = null;
         }
-    
+
         // 在庫が見つからなければ戻る
         if (!$inventory) {
             return back()->with('error', '在庫情報が見つかりません');
         }
-    
-        // ソフトデリートされたカテゴリとその中のアイテム（ソフトデリートされたもの）を取得
+
+        // ソフトデリートされたカテゴリとその中のアイテム
         $deletedCategories = InventoryCategory::onlyTrashed()
             ->where('inventory_id', $inventory->id)
             ->with(['items' => function ($query) {
                 $query->onlyTrashed();
             }])
             ->get();
-    
-        return view('category.history', compact('deletedCategories'));
+
+        // 現在のカテゴリ数（復元されていないカテゴリ）
+        $currentCategoryCount = InventoryCategory::where('inventory_id', $inventory->id)->count();
+
+        return view('category.history', compact('deletedCategories', 'currentCategoryCount'));
     }
-    
 
     public function restore($id)
     {
         $category = InventoryCategory::onlyTrashed()->findOrFail($id);
+
+        // 復元対象のカテゴリが属する inventory_id を取得
+        $inventoryId = $category->inventory_id;
+
+        // 現在のカテゴリ数を取得（削除されていないものだけ）
+        $currentCategoryCount = InventoryCategory::where('inventory_id', $inventoryId)->count();
+
+        if ($currentCategoryCount >= 5) {
+            return redirect()->route('category.history')->with('error', 'カテゴリは最大5つまでです。1つ削除してから復元してください。');
+        }
 
         // カテゴリ復元
         $category->restore();
@@ -138,6 +150,23 @@ class CategoryController extends Controller
 
         return redirect()->route('category.history')->with('success', 'カテゴリとアイテムを復元しました');
     }
+
+    public function forceDelete($id)
+    {
+        $category = InventoryCategory::onlyTrashed()->findOrFail($id);
+
+        // 紐づくアイテムも物理削除
+        InventoryItem::onlyTrashed()
+            ->where('category_id', $category->id)
+            ->forceDelete();
+
+        // カテゴリを物理削除
+        $category->forceDelete();
+
+        return redirect()->route('category.history')->with('success', 'カテゴリとアイテムを完全に削除しました');
+    }
+
+
 
 
 }

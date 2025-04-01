@@ -13,19 +13,28 @@
     <!-- ▼ 現在のスペース名 -->
     <div id="space-selector" style="cursor: pointer; display: inline-block;">
         <h2 style="display: inline;">
-            {{ $currentType === 'group' && isset($currentGroup) ? $currentGroup->name . ' グループ' : $user->user_name }}
+            @if ($currentType === 'group' && isset($currentGroup))
+                {{ $currentGroup->name }} グループ
+            @elseif ($currentType === 'personal' && $inventory)
+                {{ $inventory->name }}
+            @else
+                {{ $user->user_name }}
+            @endif
             <i class="fa fa-chevron-down"></i>
         </h2>
     </div>
 
     <!-- ▼ スペース切り替えメニュー -->
     <div id="space-menu" style="display: none; margin-bottom: 20px;">
-        <form method="POST" action="{{ route('stock.switch', ['type' => 'personal']) }}">
-            @csrf
-            <button type="submit" style="{{ $currentType === 'personal' ? 'font-weight: bold;' : '' }}">
-                {{ $user->user_name }}
-            </button>
-        </form>
+        @foreach ($personalInventories as $inv)
+            <form method="POST" action="{{ route('stock.switch', ['type' => 'personal', 'inventoryId' => $inv->id]) }}">
+                @csrf
+                <button type="submit" style="{{ $inventory && $inventory->id === $inv->id ? 'font-weight: bold;' : '' }}">
+                    {{ $inv->name }}
+                </button>
+            </form>
+        @endforeach
+
         @foreach ($groups as $group)
             <form method="POST" action="{{ route('stock.switch', ['type' => 'group', 'groupId' => $group->id]) }}">
                 @csrf
@@ -34,12 +43,15 @@
                 </button>
             </form>
         @endforeach
-        @if($groups->count() + 1 < 5)
-            <button onclick="window.location.href='/create-group'" style="margin-top: 10px; font-weight: bold;">
+
+        @if(($personalInventories->count() + $groups->count()) < 5)
+            <button onclick="window.location.href='{{ route('group.create.form') }}'" style="margin-top: 10px; font-weight: bold;">
                 ＋ スペースを追加
             </button>
         @endif
+
     </div>
+
 
     <h3>在庫カテゴリ</h3>
 
@@ -75,7 +87,7 @@
             <form id="category-form" action="{{ route('category.store') }}" method="POST" style="display: none; margin-top: 10px;">
                 @csrf
                 <input type="text" name="name" placeholder="カテゴリ名" required>
-                <input type="hidden" name="inventory_id" value="{{ $inventory->id }}">
+                <input type="hidden" name="inventory_id" value="{{ $inventory->id ?? '' }}">
                 <button type="submit">追加</button>
             </form>
         </div>
@@ -99,13 +111,22 @@
     @endif
 
     <br>
-    <button onclick="window.location.href='{{ route('group.invite') }}'">メンバーを招待</button>
+    <br>
     @if($currentType === 'group' && isset($currentGroup))
+        <button onclick="window.location.href='{{ route('group.invite') }}'">メンバーを招待</button>
+
         <form method="POST" action="{{ route('group.leave', ['groupId' => $currentGroup->id]) }}" onsubmit="return confirm('本当にこのグループから退出しますか？');" style="margin-top: 10px;">
             @csrf
             <button type="submit" style="color: red;">グループから退出</button>
         </form>
+    @elseif($currentType === 'personal' && $inventory)
+        <form method="POST" action="{{ route('inventory.destroy', ['inventory' => $inventory->id]) }}" onsubmit="return confirm('この個人スペースを削除しますか？');" style="margin-top: 10px;">
+            @csrf
+            @method('DELETE')
+            <button type="submit" style="color: red;">スペースを削除</button>
+        </form>
     @endif
+
 
     <button onclick="window.location.href='/history'">履歴</button>
     <button onclick="window.location.href='/settings'">設定</button>
