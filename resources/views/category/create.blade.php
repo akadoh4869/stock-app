@@ -12,8 +12,7 @@
         <a href="{{ route('stock.index') }}" style="text-decoration: none; font-size: 18px;">← 戻る</a>
     </div>
     <div class="container">
-        {{-- ✅ 送信先を item.store に変更 --}}
-        <form action="{{ route('item.store') }}" method="POST">
+        <form action="{{ route('category.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <input type="text" name="category_name" class="group-input" placeholder="例：スキンケア用品" required>
 
@@ -32,6 +31,9 @@
                         <div class="item-number">{{ $i }}</div>
                         <input type="text" name="items[{{ $i }}][name]" placeholder="{{ $placeholders[$i] }}" required>
                         <div class="item-row">
+                            写真 <input type="file" name="items[{{ $i }}][image]" accept="image/*">
+                        </div>
+                        <div class="item-row">
                             <label><input type="checkbox" name="items[{{ $i }}][has_expiration]"> 期限</label>
                             <input type="date" name="items[{{ $i }}][expiration_date]">
                         </div>
@@ -39,14 +41,6 @@
                             <label><input type="checkbox" name="items[{{ $i }}][has_purchase]"> 購入日</label>
                             <input type="date" name="items[{{ $i }}][purchase_date]">
                         </div>
-                        <div class="item-row">
-                            個数 <input type="number" name="items[{{ $i }}][quantity]" min="1" value="1">
-                        </div>
-                        <div class="item-row">
-                            メモ <input type="text" name="items[{{ $i }}][memo]">
-                        </div>
-
-                        {{-- ✅ グループモードのみ所有者セレクト表示 --}}
                         @if ($currentType === 'group' && isset($currentGroup))
                             <div class="item-row">
                                 所有者
@@ -58,6 +52,12 @@
                                 </select>
                             </div>
                         @endif
+                        <div class="item-row">
+                            個数 <input type="number" name="items[{{ $i }}][quantity]" min="1" value="1">
+                        </div>
+                        <div class="item-row">
+                            メモ <input type="text" name="items[{{ $i }}][memo]">
+                        </div>
                     </div>
                 @endfor
             </div>
@@ -68,16 +68,14 @@
         </form>
 
         <div class="bottom-menu">
-            <div>🏠<br>ホーム</div>
-            <div>🕒<br>履歴</div>
-            <div>⚙️<br>設定</div>
+            <a href="/top"><div>🏠<br>ホーム</div></a>
+            <a href="/history"><div>🕒<br>履歴</div></a>
+            <a href="/settings"><div>⚙️<br>設定</div></a>
         </div>
     </div>
 
     <script>
         let itemIndex = 5;
-
-        // ✅ グループユーザーをJavaScriptに渡す
         const currentType = "{{ $currentType }}";
         const groupUsers = @json($currentType === 'group' && isset($currentGroup) ? $currentGroup->users : []);
 
@@ -102,6 +100,9 @@
                 <div class="item-number">${itemIndex}</div>
                 <input type="text" name="items[${itemIndex}][name]" placeholder="アイテム名" required>
                 <div class="item-row">
+                    写真 <input type="file" name="items[${itemIndex}][image]" accept="image/*">
+                </div>
+                <div class="item-row">
                     <label><input type="checkbox" name="items[${itemIndex}][has_expiration]"> 期限</label>
                     <input type="date" name="items[${itemIndex}][expiration_date]">
                 </div>
@@ -109,13 +110,13 @@
                     <label><input type="checkbox" name="items[${itemIndex}][has_purchase]"> 購入日</label>
                     <input type="date" name="items[${itemIndex}][purchase_date]">
                 </div>
+                ${ownerSelect}
                 <div class="item-row">
                     個数 <input type="number" name="items[${itemIndex}][quantity]" min="1" value="1">
                 </div>
                 <div class="item-row">
                     メモ <input type="text" name="items[${itemIndex}][memo]">
                 </div>
-                ${ownerSelect}
             </div>
             `;
 

@@ -57,9 +57,18 @@
                     @if($currentType === 'group')
                         <div class="item-row">
                             <label>所有者：</label>
-                            <span>{{ $item->owner?->user_name ?? '共有' }}</span>
+                            <select name="owner_id" data-item-id="{{ $item->id }}" class="autosave-input">
+                                <option value="">共有</option>
+                                @foreach($currentGroup->users as $userOption)
+                                    <option value="{{ $userOption->id }}"
+                                        {{ $item->owner_id === $userOption->id ? 'selected' : '' }}>
+                                        {{ $userOption->user_name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     @endif
+                
             
                     <div class="item-row">
                         <label>個数：</label>
@@ -107,6 +116,20 @@
             </button>
         </div>
     </form>
+
+    <div class="bottom-menu">
+        <a href="/top">
+            <div>🏠<br>ホーム</div>
+        </a>
+        <a href="{{ route('category.history.category', ['categoryId' => $category->id]) }}">
+            🕒 履歴
+        </a>
+        
+        <a href="/settings">
+            <div>⚙️<br>設定</div>
+        </a>
+    </div>
+    
 
     
 </body>
