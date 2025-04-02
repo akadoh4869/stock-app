@@ -8,6 +8,7 @@ use App\Models\Group;
 use App\Models\Inventory;
 use App\Models\InventoryCategory;
 use App\Models\InventoryItem;
+use App\Models\InventoryItemImage;
 use App\Models\User;
 
 
@@ -37,78 +38,87 @@ class CategoryController extends Controller
 
     
     public function store(Request $request)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'inventory_id' => 'required|exists:inventories,id',
-    ]);
-
-    // カテゴリ作成
-    $category = InventoryCategory::create([
-        'name' => $request->name,
-        'inventory_id' => $request->inventory_id,
-    ]);
-
-    if ($request->has('items')) {
-        foreach ($request->items as $index => $itemData) {
-            if (empty($itemData['name'])) {
-                continue;
-            }
-
-            $item = new InventoryItem([
-                'name' => $itemData['name'],
-                'expiration_date' => !empty($itemData['has_expiration']) ? $itemData['expiration_date'] ?? null : null,
-                'purchase_date' => !empty($itemData['has_purchase']) ? $itemData['purchase_date'] ?? null : null,
-                'quantity' => $itemData['quantity'] ?? 1,
-                'description' => $itemData['memo'] ?? '',
-                'owner_id' => $itemData['owner_id'] ?? null,
-                'category_id' => $category->id,
-            ]);
-            $item->save();
-
-            \Log::info('保存されたitemのID: ' . $item->id);
-
-            if (!$item->id) {
-                continue;
-            }
-
-            // ✅ 画像処理：items.0.image のような形で来るので、直接取得
-            $imageFile = $request->file("items.$index.image");
-            if ($imageFile && $imageFile->isValid()) {
-                $path = $imageFile->store('item_images', 'public');
-
-                InventoryItemImage::create([
-                    'item_id' => $item->id,
-                    'image_path' => $path,
+    {
+        $request->validate([
+            'category_name' => 'required|string|max:255', // ← 修正ここ
+        ]);
+    
+        $user = Auth::user();
+        $currentType = session('current_type');
+        $currentGroupId = session('current_group_id');
+    
+        // ✅ inventory_id を取得
+        if ($currentType === 'group' && $currentGroupId) {
+            $inventory = Inventory::where('group_id', $currentGroupId)->first();
+        } else {
+            $inventory = Inventory::where('owner_id', $user->id)->whereNull('group_id')->first();
+        }
+    
+        if (!$inventory) {
+            return back()->with('error', '在庫が見つかりませんでした。');
+        }
+    
+        // ✅ カテゴリ作成
+        $category = InventoryCategory::create([
+            'name' => $request->category_name, // ← 修正ここ
+            'inventory_id' => $inventory->id,
+        ]);
+    
+        if ($request->has('items')) {
+            foreach ($request->items as $index => $itemData) {
+                if (empty($itemData['name'])) {
+                    continue;
+                }
+    
+                $item = InventoryItem::create([
+                    'name' => $itemData['name'],
+                    'expiration_date' => !empty($itemData['has_expiration']) ? $itemData['expiration_date'] ?? null : null,
+                    'purchase_date' => !empty($itemData['has_purchase']) ? $itemData['purchase_date'] ?? null : null,
+                    'quantity' => $itemData['quantity'] ?? 1,
+                    'description' => $itemData['memo'] ?? '',
+                    'owner_id' => $itemData['owner_id'] ?? null,
+                    'category_id' => $category->id,
                 ]);
+    
+                // ✅ 画像保存
+                $imageFile = $request->file("items.$index.image");
+                if ($imageFile && $imageFile->isValid()) {
+                    $path = $imageFile->store('item_images', 'public');
+    
+                    InventoryItemImage::create([
+                        'item_id' => $item->id,
+                        'image_path' => $path,
+                    ]);
+                }
             }
         }
+    
+        return redirect()->route('stock.index')->with('success', 'カテゴリを作成しました');
     }
-
-    return redirect()->route('stock.index')->with('success', 'カテゴリを作成しました');
-}
-
-
+    
     public function showItems($id)
     {
         $user = Auth::user();
-        $category = InventoryCategory::with(['items.owner'])->findOrFail($id);
-    
+        
+        // ✅ images を eager load
+        $category = InventoryCategory::with(['items.owner', 'items.images'])->findOrFail($id);
+
         $currentType = session('current_type');
         $currentGroupId = session('current_group_id');
         $currentGroup = null;
-    
+
         if ($currentType === 'group' && $currentGroupId) {
             $currentGroup = $user->groups()->where('groups.id', $currentGroupId)->first();
         }
-    
+
         return view('category.items', [
             'category' => $category,
             'items' => $category->items,
             'currentType' => $currentType,
-            'currentGroup' => $currentGroup, // ← 追加
+            'currentGroup' => $currentGroup,
         ]);
-    }    
+    }
+
 
     public function destroy($id)
     {

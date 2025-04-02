@@ -75,6 +75,20 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/item/{id}/restore', [StockController::class, 'restore'])->name('item.restore');
     Route::delete('/item/{id}/force-delete', [StockController::class, 'forceDelete'])->name('item.forceDelete');
 
+    // web.php
+    // Route::post('/items/{id}/update-image', [StockController::class, 'updateImage'])->name('item.update.image');
 
+    // Route::post('/items/{item}/image', [StockController::class, 'uploadImage'])->name('item.image.upload');
+    Route::delete('/images/{image}', [StockController::class, 'deleteImage'])->name('item.image.delete');
+
+    // Route::post('/items/{item}/image', [StockController::class, 'uploadImage'])->name('item.update.image');
+
+    // Route::post('/items/{item}/image', [StockController::class, 'updateImage'])->name('item.update.image');
+
+    Route::post('/items/{item}/image', [StockController::class, 'uploadImage'])->name('item.image.upload');
+    
+    // Route::post('/items/{item}/image-upload', [StockController::class, 'uploadImage'])->name('item.image.upload');
+
+    Route::post('/items/{item}/image-upload', [StockController::class, 'uploadImage'])->name('item.image.upload');
 
 });

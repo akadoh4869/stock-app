@@ -45,7 +45,7 @@
                             <div class="item-row">
                                 所有者
                                 <select name="items[{{ $i }}][owner_id]" required>
-                                    <option value="">選択してください</option>
+                                    <option value="">共有</option>
                                     @foreach ($currentGroup->users as $member)
                                         <option value="{{ $member->id }}">{{ $member->user_name }}</option>
                                     @endforeach
