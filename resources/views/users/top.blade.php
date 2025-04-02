@@ -55,11 +55,13 @@
 
     <h3>在庫カテゴリ</h3>
 
-    <div style="margin-bottom: 10px;">
-        <button onclick="window.location.href='{{ route('category.create') }}'">
-            カテゴリ＋アイテム一括作成
-        </button>
-    </div>
+    @if(isset($categories) && count($categories) < 5)
+        <div style="margin-bottom: 10px;">
+            <button onclick="window.location.href='{{ route('category.create') }}'">
+                カテゴリ＋アイテム一括作成
+            </button>
+        </div>
+    @endif
 
     @if(isset($categories) && count($categories) > 0)
         <ul class="category-list">
@@ -86,7 +88,7 @@
             </button>
             <form id="category-form" action="{{ route('category.store') }}" method="POST" style="display: none; margin-top: 10px;">
                 @csrf
-                <input type="text" name="name" placeholder="カテゴリ名" required>
+                <input type="text" name="category_name" placeholder="カテゴリ名" required>
                 <input type="hidden" name="inventory_id" value="{{ $inventory->id ?? '' }}">
                 <button type="submit">追加</button>
             </form>

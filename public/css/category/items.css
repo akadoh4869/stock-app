@@ -1,3 +1,7 @@
+body{
+    height:200vh;
+}
+
 .item-card {
     border: 2px solid #ccf;
     border-radius: 10px;
@@ -82,4 +86,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.item-row img {
+    border: 1px solid #ccc;
+    padding: 2px;
+    background: #fff;
 }

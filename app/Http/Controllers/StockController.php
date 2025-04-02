@@ -8,7 +8,9 @@ use App\Models\Group;
 use App\Models\Inventory;
 use App\Models\InventoryCategory;
 use App\Models\InventoryItem;
+use App\Models\InventoryItemImage;
 use App\Models\GroupInvitation;
+use Illuminate\Support\Facades\Storage;
 
 class StockController extends Controller
 {
@@ -100,46 +102,44 @@ class StockController extends Controller
 
 
     public function store(Request $request)
-{
-    $user = auth()->user();
-
-    // カテゴリ作成
-    $category = InventoryCategory::create([
-        'name' => $request->input('category_name'),
-        'inventory_id' => Inventory::where('owner_id', $user->id)->first()->id // ← 必要に応じて調整
-    ]);
-
-    // 各アイテム処理
-    foreach ($request->input('items', []) as $index => $itemData) {
-        if (empty($itemData['name'])) continue; // name がないアイテムは無視
-
-        $item = new InventoryItem();
-        $item->fill([
-            'name' => $itemData['name'],
-            'expiration_date' => !empty($itemData['has_expiration']) ? $itemData['expiration_date'] ?? null : null,
-            'purchase_date' => !empty($itemData['has_purchase']) ? $itemData['purchase_date'] ?? null : null,
-            'quantity' => $itemData['quantity'] ?? 1,
-            'description' => $itemData['memo'] ?? '',
-            'owner_id' => $itemData['owner_id'] ?? null,
-            'category_id' => $category->id,
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'category_id' => 'required|exists:inventory_categories,id',
+            'quantity' => 'nullable|integer|min:1',
+            'expiration_date' => 'nullable|date',
+            'purchase_date' => 'nullable|date',
+            'owner_id' => 'nullable|exists:users,id',
+            'image' => 'nullable|image|max:2048', // ← photo → image に修正
         ]);
-        $item->save();
-
-        // 画像があれば保存
-        $imageKey = "items.$index.image"; // フォームから送られたファイル名と一致
-        if ($request->hasFile($imageKey)) {
-            $path = $request->file($imageKey)->store('item_images', 'public');
-
-            \App\Models\InventoryItemImage::create([
-                'inventory_item_id' => $item->id,
+    
+        // アイテム作成
+        $item = InventoryItem::create([
+            'name' => $request->name,
+            'category_id' => $request->category_id,
+            'quantity' => $request->quantity ?? 1,
+            'expiration_date' => $request->expiration_date,
+            'purchase_date' => $request->purchase_date,
+            'description' => $request->description,
+            'owner_id' => $request->owner_id,
+        ]);
+    
+        // 画像保存（1枚のみ対応）
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            $path = $request->file('image')->store('item_images', 'public');
+    
+            InventoryItemImage::create([
+                'item_id' => $item->id, // ← item_id ではなく inventory_item_id に合わせる
                 'image_path' => $path,
             ]);
         }
+    
+        return response()->json([
+            'message' => 'アイテムを保存しました',
+            'id' => $item->id,
+        ]);
     }
-
-    return redirect()->route('stock.index')->with('success', 'カテゴリとアイテムを作成しました');
-}
-
+    
 
     public function update(Request $request, InventoryItem $item)
     {
@@ -157,6 +157,40 @@ class StockController extends Controller
     
         return response()->json(['message' => '保存成功']);
     }
+
+    public function uploadImage(Request $request, InventoryItem $item)
+    {
+        $request->validate([
+            'image' => 'required|image|max:2048',
+        ]);
+    
+        // 古い画像削除（1枚制限）
+        foreach ($item->images as $img) {
+            Storage::disk('public')->delete($img->image_path);
+            $img->delete();
+        }
+    
+        // 新しい画像を保存
+        $path = $request->file('image')->store('item_images', 'public');
+        InventoryItemImage::create([
+            'item_id' => $item->id,
+            'image_path' => $path,
+        ]);
+    
+        return back()->with('success', '画像を更新しました');
+    }
+    
+
+    
+    public function deleteImage(InventoryItemImage $image)
+    {
+        Storage::disk('public')->delete($image->image_path);
+        $image->delete();
+    
+        return back();
+    }
+    
+
 
     public function destroy(InventoryItem $item)
     {

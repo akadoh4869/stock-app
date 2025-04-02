@@ -19,9 +19,10 @@ class InventoryItem extends Model
         return $this->belongsTo(InventoryCategory::class, 'category_id'); // 🔹 inventory_category_id ではなく category_id
     }
 
+    // InventoryItem.php
     public function images()
     {
-        return $this->hasMany(InventoryItemImage::class);
+        return $this->hasMany(InventoryItemImage::class, 'item_id'); // ← 正しい外部キーを指定
     }
 
     public function owner()
