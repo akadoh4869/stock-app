@@ -10,7 +10,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['user_name', 'email', 'password', 'is_admin'];
+    protected $fillable = ['name','user_name', 'email', 'password', 'is_admin'];
 
     /**
      * ユーザーが所属しているグループを取得する
