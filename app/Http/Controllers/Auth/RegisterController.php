@@ -30,7 +30,6 @@ class RegisterController extends Controller
      */
     protected $redirectTo = '/top';
 
-
     /**
      * Create a new controller instance.
      *
@@ -51,7 +50,8 @@ class RegisterController extends Controller
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'user_name' => ['required','string','max:255','unique:users'],
+            // 'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
     }
@@ -64,10 +64,27 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        // dd($data['user_name']); // ここで user_name の内容を確認
+        // dd($data);
+
         return User::create([
             'name' => $data['name'],
-            'email' => $data['email'],
+            'user_name' => $data['user_name'],
             'password' => Hash::make($data['password']),
+            // デフォルトのアバターを設定
+            // 'avatar' => '/images/TimeMafia1.jpg', // デフォルトのアバターのパス
+
         ]);
     }
+
+    // app/Http/Controllers/Auth/RegisterController.php
+
+    public function checkUsername(Request $request)
+    {
+        $user_name = $request->input('user_name');
+        $exists = User::where('user_name', $user_name)->exists();
+
+        return response()->json(['exists' => $exists]);
+    }
+
 }
