@@ -1,85 +1,204 @@
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-}
-.group-list {
-    list-style: none;
+    font-family: 'Arial', sans-serif;
+    background-color: white;
+    margin: 0;
     padding: 0;
+    overflow-x: hidden; /* 横スクロール防止 */
 }
-.group-list li {
-    margin: 10px 0;
+
+main {
+    max-width: 430px;
+    margin: 0 auto; /* ← 横方向中央寄せ */
+    text-align: center;
+    padding: 0 10px; /* スマホでも余白を確保 */
 }
+
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.user-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: #888;
+}
+
+.app-name {
+    font-size: 20px;
+    font-weight: 900;
+    color: #7dd3fc; /* 明るい水色 */
+}
+
+/* スペースセレクターは非表示状態でOK */
+#space-selector {
+    display: none;
+}
+
+
+/* ヘッダー部分（名前＋グループ切り替え） */
+#space-selector h2 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #888;
+    margin: 20px 0 10px;
+}
+
+/* ＋ストック一括作成ボタン */
+button {
+    background: none;
+    border: 2px solid #ff66cc;
+    color: #ff66cc;
+    font-weight: bold;
+    padding: 10px 16px;
+    border-radius: 30px;
+    cursor: pointer;
+    margin: 10px auto;
+    display: inline-block;
+}
+
+button:hover {
+    background-color: #ffe6f2;
+}
+
+/* カテゴリリスト */
 .category-list {
     list-style: none;
     padding: 0;
-    border: 2px solid purple;
-    display: inline-block;
-    padding: 10px;
+    margin: 20px auto;
+    max-width: 280px;
 }
+
 .category-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px dotted #999;
-    padding: 5px;
+    border-bottom: dotted 2px #ccc;
+    padding: 10px 0;
+    font-size: 16px;
 }
+
 .category-dot {
-    width: 12px;
-    height: 12px;
+    width: 15px;
+    height: 15px;
     border-radius: 50%;
     margin-right: 10px;
+    flex-shrink: 0;
 }
 
-#user-name-toggle {
-    font-size: 1.5em;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-#space-switcher button {
-    margin: 5px 0;
-}
-
-#space-selector h2 {
-    font-size: 1.5em;
-    font-weight: bold;
-    margin-bottom: 10px;
+/* スペース切り替えメニュー */
+#space-menu {
+    background-color: #f3f3f3;
+    border-radius: 20px 20px 0 0;
+    padding: 20px 10px 30px;
+    margin-top: -20px;
+    position: relative;
 }
 
 #space-menu button {
-    display: block;
-    margin: 5px auto;
-    width: 200px;
-    padding: 6px;
+    border: 2px solid #ff66cc;
+    color: #ff66cc;
+    background-color: #fff;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 30px;
+    width: 80%;
 }
 
-#space-menu button:last-child {
-    background-color: #f0f0f0;
-    color: #333;
-    border: 1px dashed #aaa;
+#space-menu button[style*="font-weight: bold"] {
+    background-color: #d0f0f8;
+    color: #00bcd4;
 }
 
-.category-list button {
-    display: block;
-    margin: 5px auto;
-    padding: 6px 10px;
+/* カテゴリ追加ボタン */
+#show-category-input {
+    border: 2px dashed #00bcd4;
+    color: #00bcd4;
+    padding: 8px 14px;
+    border-radius: 30px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+/* アイコン付きメニュー（下部の招待・履歴・設定） */
+.bottom-menu {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 40px;
+    border-top: 3px solid #ff66cc;
+    padding-top: 20px;
+}
+
+.bottom-menu button {
+    background: none;
+    border: none;
     font-size: 14px;
+    color: #666;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.category-list button:last-child {
-    background-color: #f9f9f9;
-    border: 1px dashed #888;
-    color: #444;
+.bottom-menu i {
+    font-size: 20px;
+    margin-bottom: 4px;
 }
 
-.popup {
+.popup-overlay {
     position: fixed;
-    top: 20%;
-    left: 10%;
-    right: 10%;
-    background: #fff;
-    border: 1px solid #ccc;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    background: rgba(0, 0, 0, 0.3); /* 背景グレーアウト */
+    z-index: 999;
+    display: flex;
+    align-items: flex-end; /* 下から出す */
+    justify-content: center;
+}
+
+.popup-menu {
+    background: white;
+    border-radius: 20px 20px 0 0;
     padding: 20px;
-    z-index: 1000;
-    box-shadow: 0 0 10px #999;
+    width: 100%;
+    max-width: 500px;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.popup-menu button {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    border: 2px solid pink;
+    border-radius: 30px;
+    background: white;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.popup-menu .selected {
+    background: #e0f7fa;
+    border-color: cyan;
+}
+
+.add-space-button {
+    margin-top: 20px;
+    background: white;
+    color: hotpink;
+    border: 2px solid hotpink;
 }
