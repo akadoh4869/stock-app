@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="在庫管理はすとログ">
-    <title>すとログ</title>
+    <title>ストログ</title>
     {{-- <title>TimeMafia - タイムマフィアで楽しくクイズ！</title> --}}
     {{-- <link rel="manifest" href="/manifest.json"> --}}
     {{-- <meta name="theme-color" content="#111111"> --}}
@@ -40,7 +40,7 @@
 
     <div class="container">
         <div class="subtitle">ストック管理するなら</div>
-        <div class="title">すとログ</div>
+        <div class="title">ストログ</div>
         <a href="{{ route('register') }}" class="button btn-register">新規登録</a>
         <a href="{{ route('login') }}" class="button btn-login">ログイン</a>
     </div>
