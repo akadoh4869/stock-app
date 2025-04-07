@@ -41,6 +41,7 @@ class CategoryController extends Controller
     {
         $request->validate([
             'category_name' => 'required|string|max:255', // ← 修正ここ
+            'inventory_id' => 'required|integer|exists:inventories,id',
         ]);
     
         $user = Auth::user();
@@ -94,6 +95,7 @@ class CategoryController extends Controller
         }
     
         return redirect()->route('stock.index')->with('success', 'カテゴリを作成しました');
+        
     }
     
     public function showItems($id)
@@ -228,6 +230,16 @@ class CategoryController extends Controller
             'filteredItemOnly' => true,
             'deletedItems' => $deletedItems,
         ]);
+    }
+
+    // CategoryController.php
+    public function updateName(Request $request, $id)
+    {
+        $category = InventoryCategory::findOrFail($id);
+        $category->name = $request->input('name');
+        $category->save();
+
+        return response()->json(['success' => true]);
     }
 
 
