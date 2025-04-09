@@ -15,6 +15,7 @@
     <!-- Styles -->
     <link rel="stylesheet" href="{{ asset('css/auth/register.css') }}">
     
+    
 </head>
 <body>
     <div class="background">
