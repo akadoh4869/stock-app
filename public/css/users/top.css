@@ -11,6 +11,7 @@ main {
     max-width: 430px;
     margin: 0 auto;
     text-align: center;
+    height: auto;
 }
 
 .line-top,
@@ -96,7 +97,7 @@ main {
 
 .bulk-create button{
     width: 100%;
-    border: 2px solid #ff66cc;
+    border: 2px solid hotpink;
     color: gray;
     font-weight: bold;
     padding: 15px 24px;
@@ -182,21 +183,62 @@ main {
     transform: translateX(0);
 }
 
+#category-form{
+    margin-left: -6%;
+}
 
+.line-bottom-fixed {
+    position: fixed;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    z-index: 0;
+}
 
-/* footerのボタン整列 */
-.footer {
+.line-bottom-fixed img {
+    width: 100%;
+    display: block;
+}
+
+.footer-overlay-fixed {
+    position: fixed;
+    bottom: 80px; /* 画像上に表示されるよう調整 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
     display: flex;
     justify-content: space-around;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 30px 0 10px;
+    align-items: center;
+    padding: 0 20px;
+    background: transparent;
+    z-index: 10;
+}
+
+.footer-overlay-fixed button {
+    background: none;
+    border: none;
+    font-size: 14px;
+    color: #666;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.footer-overlay-fixed i {
+    font-size: 24px;
+    margin-bottom: 4px;
+    color: #38bdf8;
 }
 
 
 .popup-overlay {
     position: fixed;
-    bottom: 0;
+    bottom: 50px;
     left: 0;
     right: 0;
     top: 0;
@@ -225,12 +267,13 @@ main {
     }
 }
 
-.popup-menu button {
+/* 通常のボタン（選択スペース） */
+.popup-menu form button {
     display: block;
     width: 100%;
     margin: 10px 0;
     padding: 10px;
-    border: 2px solid pink;
+    border: 2px solid hotpink;
     border-radius: 30px;
     background: white;
     color: #333;
@@ -238,14 +281,33 @@ main {
     cursor: pointer;
 }
 
+/* 選択中スタイル */
 .popup-menu .selected {
     background: #e0f7fa;
     border-color: cyan;
 }
 
-.add-space-button {
-    margin-top: 20px;
-    background: white;
+/* グループ追加ボタンの専用スタイル */
+.add-space-container {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.add-space-button-no-border {
+    background: none;
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.add-space-button-no-border i {
+    font-size: 24px;
     color: hotpink;
-    border: 2px solid hotpink;
 }

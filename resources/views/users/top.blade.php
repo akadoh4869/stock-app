@@ -50,16 +50,22 @@
                         <form method="POST" action="{{ route('stock.switch', ['type' => 'group', 'groupId' => $group->id]) }}">
                             @csrf
                             <button type="submit" class="{{ $currentType === 'group' && $currentGroup && $group->id === $currentGroup->id ? 'selected' : '' }}">
-                                {{ $group->name }}
+                                {{-- {{ $group->name }} （{{ $group->users->count() }}） --}}
+                                {{ $group->name }} <span class="member-count">（{{ $group->users->count() }}）</span>
+
                             </button>
                         </form>
                     @endforeach
     
+                    <!-- グループ一覧の最後に表示 -->
                     @if(($personalInventories->count() + $groups->count()) < 5)
-                        <button onclick="window.location.href='{{ route('group.create.form') }}'" class="add-space-button">
-                            ＋ グループを追加
-                        </button>
+                        <div class="add-space-container">
+                            <button onclick="window.location.href='{{ route('group.create.form') }}'" class="add-space-button-no-border">
+                                <i class="fa-solid fa-circle-plus"></i> グループを追加
+                            </button>
+                        </div>
                     @endif
+
                 </div>
             </div>
     
@@ -83,21 +89,16 @@
                         ontouchmove="handleTouchMove(event, this)"
                         ontouchend="handleTouchEnd(event, this)">
                         
-                        <div class="category-dot" style="background-color: {{ $loop->index % 2 == 0 ? 'pink' : 'cyan' }}"></div>
-            
+                        <div class="category-dot" style="background-color: {{ $loop->index % 2 == 0 ? 'hotpink' : 'cyan' }}"></div>
+
                         <div class="category-content" style="border-color: {{ $loop->index % 2 == 0 ? 'cyan' : 'hotpink' }}">
-                            <!-- 表示用テキスト -->
-                            <span class="category-name">{{ $category->name }}</span>
-                            
-                            <!-- 編集用 input -->
-                            <input type="text"
-                                class="category-edit-input"
-                                value="{{ $category->name }}"
-                                style="display: none; font-size: 16px; width: 80%; border: none; outline: none; background: transparent;" />
-                            
+                            <a href="{{ route('category.items', ['id' => $category->id]) }}"
+                            style="text-decoration: none; color: inherit;">
+                                {{ $category->name }}
+                            </a>
                             <span class="category-count">（{{ $category->items->count() }}）</span>
                         </div>
-            
+
                         <!-- 削除ボタン -->
                         <form method="POST" action="{{ route('category.destroy', $category->id) }}"
                             onsubmit="return confirmDelete({{ $category->items->count() }})">
@@ -109,59 +110,66 @@
                     @endforeach
                 </ul>
             @endif
-        
+
             @php
                 $lastIndex = isset($categories) ? count($categories) : 0;
             @endphp
 
             @if(!isset($categories) || count($categories) < 5)
-            <li class="category-item category-add">
-                <div class="category-dot"
-                    style="background-color: hotpink; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold;">
-                    ＋
-                </div>
-                <div class="category-content"
-                    style="border-color: {{ $lastIndex % 2 === 0 ? 'cyan' : 'hotpink' }};">
-                    <form id="category-form" action="{{ route('category.store') }}" method="POST">
-                        @csrf
-                        <input type="text"
-                        id="new-category-name"
-                        name="category_name"
-                        placeholder="カテゴリ追加"
-                        required
-                        style="border: none; background: transparent; outline: none; font-size: 16px; color: gray; width: 80%;">  
-                        <input type="hidden" name="inventory_id" value="{{ $inventory->id ?? '' }}">
-                    </form>
-                </div>
-            </li>
+                <li class="category-item category-add">
+                    <div class="category-dot"
+                        style="background-color: hotpink; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold;">
+                        ＋
+                    </div>
+                    <div class="category-content"
+                        style="border-color: {{ $lastIndex % 2 === 0 ? 'cyan' : 'hotpink' }};">
+                        <form id="category-form" action="{{ route('category.store') }}" method="POST">
+                            @csrf
+                            <input type="text" id="new-category-name" name="category_name" placeholder="カテゴリ追加" required style="border: none; background: transparent; outline: none; font-size: 16px; color: gray; width: 80%;">  
+                            <input type="hidden" name="inventory_id" value="{{ $inventory->id ?? '' }}">
+                        </form>
+                    </div>
+                </li>
+            @endif
+        </div>
+        
+        <!-- フッター背景画像（画面最下部に固定） -->
+        <div class="line-bottom-fixed">
+            <img src="{{ asset('/storage/images/bottom-line.jpg') }}" alt="下ライン">
+        </div>
+
+        <!-- フッターのボタン群（画像の上に表示） -->
+        <div class="footer-overlay-fixed">
+            @if($currentType === 'group' && isset($currentGroup))
+                <button onclick="window.location.href='{{ route('group.invite') }}'">
+                    <i class="fa-solid fa-user-plus"></i><br>メンバー招待
+                </button>
+                <form method="POST" action="{{ route('group.leave', ['groupId' => $currentGroup->id]) }}"
+                    onsubmit="return confirm('本当にこのグループから退出しますか？');">
+                    @csrf
+                    <button type="submit" style="color: red;">
+                        <i class="fa-solid fa-user-minus"></i><br>退出
+                    </button>
+                </form>
+            @elseif($currentType === 'personal' && $inventory)
+                <form method="POST" action="{{ route('inventory.destroy', ['inventory' => $inventory->id]) }}"
+                    onsubmit="return confirm('この個人スペースを削除しますか？');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" style="color: red;">
+                        <i class="fa-solid fa-trash"></i><br>削除
+                    </button>
+                </form>
             @endif
 
+            <button onclick="window.location.href='/history'">
+                <i class="fa-solid fa-clock"></i><br>履歴
+            </button>
+            <button onclick="window.location.href='/settings'">
+                <i class="fa-solid fa-gear"></i><br>設定
+            </button>
+        </div>
 
-    
-        </div>
-        <div class="footer">
-            @if($currentType === 'group' && isset($currentGroup))
-            <button onclick="window.location.href='{{ route('group.invite') }}'">メンバーを招待</button>
-    
-            <form method="POST" action="{{ route('group.leave', ['groupId' => $currentGroup->id]) }}" onsubmit="return confirm('本当にこのグループから退出しますか？');" style="margin-top: 10px;">
-                @csrf
-                <button type="submit" style="color: red;">グループから退出</button>
-            </form>
-        @elseif($currentType === 'personal' && $inventory)
-            <form method="POST" action="{{ route('inventory.destroy', ['inventory' => $inventory->id]) }}" onsubmit="return confirm('この個人スペースを削除しますか？');" style="margin-top: 10px;">
-                @csrf
-                @method('DELETE')
-                <button type="submit" style="color: red;">スペースを削除</button>
-            </form>
-        @endif
-    
-    
-        <button onclick="window.location.href='/history'">履歴</button>
-        <button onclick="window.location.href='/settings'">設定</button>
-            
-        </div>
-    
-        
     
         @if($pendingInvitations->isNotEmpty())
         <div id="invitation-popup" class="popup">
@@ -182,9 +190,7 @@
     
         <br>
         <br>
-        <div class="line-bottom">
-            <img src="{{ asset('/storage/images/bottom-line.jpg') }}" alt="下ライン">
-        </div>
+        
 
     </main>
     
@@ -226,53 +232,6 @@
             if (e.target.id === 'space-popup-overlay') {
                 e.target.style.display = 'none';
             }
-        });
-
-        document.querySelectorAll('.category-name').forEach(el => {
-            el.addEventListener('click', () => {
-                const input = el.nextElementSibling;
-                el.style.display = 'none';
-                input.style.display = 'inline-block';
-                input.focus();
-            });
-        });
-
-        document.querySelectorAll('.category-edit-input').forEach(input => {
-            const originalValue = input.value;
-
-            const saveCategoryName = () => {
-                const id = input.closest('.category-item').dataset.id;
-                const newName = input.value.trim();
-
-                if (newName && newName !== originalValue) {
-                    fetch(`/category/update/${id}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({ name: newName })
-                    }).then(res => {
-                        if (res.ok) {
-                            input.previousElementSibling.textContent = newName;
-                        }
-                    });
-                }
-
-                input.previousElementSibling.style.display = 'inline-block';
-                input.style.display = 'none';
-            };
-
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    saveCategoryName();
-                }
-            });
-
-            input.addEventListener('blur', () => {
-                saveCategoryName();
-            });
         });
 
         // 削除確認
@@ -332,15 +291,6 @@
                     event.target.closest('form').submit();
                 }
             }
-
-            // function toggleCategoryForm() {
-            //     const form = document.getElementById('category-form');
-            //     if (form.style.display === 'none') {
-            //         form.style.display = 'block';
-            //     } else {
-            //         form.style.display = 'none';
-            //     }
-            // }
 
             document.getElementById('new-category-name').addEventListener('blur', function () {
             const input = this;
