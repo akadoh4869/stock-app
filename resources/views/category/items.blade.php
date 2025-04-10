@@ -98,6 +98,12 @@
                 <div id="item-form-container"></div>
                 <div style="text-align: center; margin-top: 10px;"></div>
             </form>
+            {{-- 一覧下に表示するボタン（デフォルト表示） --}}
+            <div id="bottom-add-button" class="add-button-bottom" style="text-align: center; margin-top: 20px;">
+                <button class="pink-button" id="add-item-button-bottom">
+                    <i class="fa fa-plus"></i> ストック追加
+                </button>
+            </div>
         </div>
         
         <!-- フッター背景画像（画面最下部に固定） -->
@@ -119,11 +125,12 @@
                 </a>
             </div>
 
-            <button class="add-stock-button" id="add-item-button">
+            {{-- 右下に固定するボタン（5件以上で表示） --}}
+            <button class="add-stock-button" id="add-item-button-fixed" style="display: none;">
                 <i class="fa fa-plus"></i>
             </button>
+              
         </div>
-
 
         <div id="item-overlay" class="overlay" style="display: none;">
             <div class="overlay-content">
@@ -157,22 +164,26 @@
                 </div>
             </div>
         </div>
+        <!-- 🔽 拡大表示用モーダル -->
+        <div id="image-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); justify-content: center; align-items: center; z-index: 9999; position: fixed;">
+            <!-- ✕ボタン -->
+            <button id="image-modal-close" style="position: absolute; top: 15px; right: 20px; font-size: 24px; color: white; background: none; border: none; cursor: pointer;">
+                ✕
+            </button>
+            <img id="modal-image" src="" style="max-width: 90%; max-height: 90%; border-radius: 10px;">
+        </div>
+        <!-- ✅ ここに追加 -->
+        <!-- アイテム追加オーバーレイ -->
+        <div id="add-form-overlay" class="modal-overlay" style="display: none;">
+            <div class="modal-card" style="max-width: 500px;">
+                <button class="modal-close" onclick="closeAddForm()">✕</button>
+                <div id="add-form-body"></div>
+            </div>
+        </div>
 
         
     </main>
-      
-    
-    
-    
-
    
-    
-    <!-- 🔽 拡大表示用モーダル -->
-    <div id="image-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(0, 0, 0, 0.7); justify-content: center; align-items: center; z-index: 9999;">
-        <img id="modal-image" src="" style="max-width: 90%; max-height: 90%; border-radius: 10px;">
-    </div>
-
     <script>
         window.currentType = "{{ $currentType }}";
         window.members = @json($currentGroup?->users->makeVisible(['user_name']) ?? []);

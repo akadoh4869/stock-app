@@ -189,7 +189,7 @@ main {
 
 .line-bottom-fixed {
     position: fixed;
-    bottom: 50px;
+    bottom: 0px;
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
@@ -204,7 +204,7 @@ main {
 
 .footer-overlay-fixed {
     position: fixed;
-    bottom: 80px; /* 画像上に表示されるよう調整 */
+    bottom: 30px; /* 画像上に表示されるよう調整 */
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
@@ -238,12 +238,12 @@ main {
 
 .popup-overlay {
     position: fixed;
-    bottom: 50px;
+    bottom: 0px;
     left: 0;
     right: 0;
     top: 0;
     background: rgba(0, 0, 0, 0.3); /* 背景グレーアウト */
-    z-index: 999;
+    z-index: 20;
     display: flex;
     align-items: flex-end; /* 下から出す */
     justify-content: center;
