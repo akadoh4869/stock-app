@@ -5,27 +5,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-    // フォーム追加
-    const addButton = document.getElementById('add-item-button');
-    if (addButton) {
-        addButton.addEventListener('click', () => {
-            const container = document.getElementById('item-form-container');
-            let ownerSelect = '';
+    const addButtons = [
+        document.getElementById('add-item-button-bottom'),
+        document.getElementById('add-item-button-fixed')
+    ];
+    
+    addButtons.forEach(btn => {
+        if (btn) {
+            btn.addEventListener('click', createItemForm);
+        }
+    });
 
-            if (window.currentType === 'group' && window.members.length > 0) {
-                ownerSelect += `<div><label>所有者：</label><select name="owner_id"><option value="">共有</option>`;
-                window.members.forEach(member => {
-                    ownerSelect += `<option value="${member.id}">${member.user_name}</option>`;
-                });
-                ownerSelect += `</select></div>`;
-            }
-
-            const formGroup = document.createElement('div');
-            formGroup.classList.add('item-form-box');
-            formGroup.setAttribute('data-index', itemIndex);
-            formGroup.style = 'border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 8px; position: relative;';
-            formGroup.innerHTML = `
-                <button type="button" class="close-form-button" style="position: absolute; top: 5px; right: 10px; font-size: 18px;">✕</button>
+    function createItemForm() {
+        const overlay = document.getElementById('add-form-overlay');
+        const body = document.getElementById('add-form-body');
+        let ownerSelect = '';
+    
+        if (window.currentType === 'group' && window.members.length > 0) {
+            ownerSelect += `<div><label>所有者：</label><select name="owner_id"><option value="">共有</option>`;
+            window.members.forEach(member => {
+                ownerSelect += `<option value="${member.id}">${member.user_name}</option>`;
+            });
+            ownerSelect += `</select></div>`;
+        }
+    
+        body.innerHTML = `
+            <div class="item-form-box" style="padding: 15px;">
                 <div><label>アイテム名：</label><input type="text" name="name" required></div>
                 <div><label>画像：</label><input type="file" name="image" accept="image/*"></div>
                 <div><label>期限日：</label><input type="date" name="expiration_date"></div>
@@ -34,12 +39,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div><label>個数：</label><input type="number" name="quantity" min="1" value="1" required></div>
                 <div><label>メモ：</label><textarea name="description" rows="2" style="width: 100%;"></textarea></div>
                 <div style="text-align:center; margin-top:10px;">
-                    <button type="button" class="submit-item-button" data-index="${itemIndex}">追加</button>
+                    <button type="button" id="submit-overlay-item" class="pink-button">追加</button>
                 </div>
-            `;
-            container.appendChild(formGroup);
-            itemIndex++;
-        });
+            </div>
+        `;
+        overlay.style.display = 'flex';
     }
 
     // フォーム削除
@@ -50,60 +54,95 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // アイテム追加
+    // document.addEventListener('click', event => {
+    //     if (event.target.classList.contains('submit-item-button')) {
+    //         const index = event.target.dataset.index;
+    //         const formBox = document.querySelector(`.item-form-box[data-index="${index}"]`);
+    //         const name = formBox.querySelector('input[name="name"]').value.trim();
+    //         const quantity = formBox.querySelector('input[name="quantity"]').value;
+    
+    //         if (!name || !quantity) {
+    //             alert('名前と個数は必須です');
+    //             return;
+    //         }
+    
+    //         const formData = new FormData();
+    //         formData.append('name', name);
+    //         formData.append('quantity', quantity);
+    //         formData.append('category_id', window.categoryId);
+    
+    //         ['expiration_date', 'purchase_date', 'owner_id', 'description'].forEach(field => {
+    //             const el = formBox.querySelector(`[name="${field}"]`);
+    //             if (el?.value) formData.append(field, el.value);
+    //         });
+    
+    //         const imageInput = formBox.querySelector('input[name="image"]');
+    //         if (imageInput?.files[0]) {
+    //             formData.append('image', imageInput.files[0]);
+    //         }
+    
+    //         formData.append('_token', csrfToken);
+    
+    //         fetch(window.itemStoreUrl, {
+    //             method: 'POST',
+    //             body: formData
+    //         })
+    //         .then(res => {
+    //             if (!res.ok) throw new Error('サーバーエラー');
+    //             return res.json();
+    //         })
+    //         .then(() => {
+    //             // 成功時にリロード
+    //             location.reload();
+    //         })
+    //         .catch(err => {
+    //             alert('保存失敗: ' + err.message);
+    //         });
+    //     }
+    // });
+
     document.addEventListener('click', event => {
-        if (event.target.classList.contains('submit-item-button')) {
-            const index = event.target.dataset.index;
-            const formBox = document.querySelector(`.item-form-box[data-index="${index}"]`);
+        if (event.target.id === 'submit-overlay-item') {
+            const formBox = document.getElementById('add-form-body');
             const name = formBox.querySelector('input[name="name"]').value.trim();
             const quantity = formBox.querySelector('input[name="quantity"]').value;
-
             if (!name || !quantity) {
                 alert('名前と個数は必須です');
                 return;
             }
-
+    
             const formData = new FormData();
             formData.append('name', name);
             formData.append('quantity', quantity);
             formData.append('category_id', window.categoryId);
-
+    
             ['expiration_date', 'purchase_date', 'owner_id', 'description'].forEach(field => {
                 const el = formBox.querySelector(`[name="${field}"]`);
                 if (el?.value) formData.append(field, el.value);
             });
-
+    
             const imageInput = formBox.querySelector('input[name="image"]');
             if (imageInput?.files[0]) {
                 formData.append('image', imageInput.files[0]);
             }
-
-            formData.append('_token', csrfToken);
-
+    
+            formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+    
             fetch(window.itemStoreUrl, {
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(item => {
-                const listContainer = document.querySelector('.main > div');
-                const newCard = document.createElement('div');
-                newCard.classList.add('item-card');
-                newCard.setAttribute('data-id', item.id);
-                newCard.setAttribute('onclick', `openOverlay(${JSON.stringify(item)})`);
-                newCard.innerHTML = `
-                    <div class="item-number">?</div>
-                    <div class="item-header">
-                        <span class="item-name">${item.name}</span>
-                        <span class="item-quantity">x ${item.quantity}</span>
-                    </div>
-                    <div class="item-row"><label>期限：</label><span>${item.expiration_date ?? ''}</span></div>
-                `;
-                listContainer.prepend(newCard);
-                formBox.remove();
+            .then(res => {
+                if (!res.ok) throw new Error('サーバーエラー');
+                return res.json();
+            })
+            .then(() => {
+                location.reload();
             })
             .catch(err => alert('保存失敗: ' + err.message));
         }
     });
+   
 
     // オーバーレイを開く
     window.openOverlay = function (item) {
@@ -137,18 +176,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // オーバーレイを閉じる
     window.closeOverlay = function () {
-        document.getElementById('item-overlay').style.display = 'none';
-
-        if (updatedItem) {
-            const card = document.querySelector(`.item-card[data-id="${updatedItem.id}"]`);
-            if (card) {
-                card.querySelector('.item-name').textContent = updatedItem.name;
-                card.querySelector('.item-quantity').textContent = 'x ' + updatedItem.quantity;
-                card.querySelector('.item-row span').textContent = updatedItem.expiration_date ?? '';
-            }
+        // オーバーレイを非表示にする（見た目だけ先に閉じる）
+        const overlay = document.getElementById('item-overlay');
+        if (overlay) {
+            overlay.style.display = 'none';
         }
-
+    
+        // 編集中の内容を updatedItem に反映（省略してもよいが保険として残す）
+        if (updatedItem) {
+            updatedItem.name = document.querySelector('input[name="name"]').value;
+            updatedItem.quantity = document.querySelector('input[name="quantity"]').value;
+            updatedItem.expiration_date = document.querySelector('input[name="expiration_date"]').value;
+            updatedItem.purchase_date = document.querySelector('input[name="purchase_date"]').value;
+            updatedItem.description = document.querySelector('textarea[name="description"]').value;
+            updatedItem.owner_id = document.querySelector('select[name="owner_id"]')?.value ?? '';
+        }
+    
         updatedItem = null;
+    
+        // ✅ ページをリロードして最新の状態に更新（編集結果を確実に反映）
+        location.reload();
     };
 
     // 自動保存
@@ -272,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (event.target.closest('.delete-item-button')) {
             const button = event.target.closest('.delete-item-button');
             const itemId = button.dataset.itemId;
-            if (!confirm('このアイテムを削除しますか？')) return;
+            // if (!confirm('このアイテムを削除しますか？')) return;
 
             fetch(`/items/${itemId}`, {
                 method: 'DELETE',
@@ -282,7 +329,8 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(response => {
                 if (!response.ok) throw new Error('削除に失敗しました');
-                button.closest('.item-card').remove();
+                location.reload(); // ✅ 削除後にページをリロード
+                // button.closest('.item-card').remove();
             })
             .catch(error => alert(error.message));
         }
@@ -291,8 +339,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const detailImage = document.getElementById('detail-image');
     const modal = document.getElementById('image-modal');
     const modalImage = document.getElementById('modal-image');
-
-    if (detailImage && modal && modalImage) {
+    const modalClose = document.getElementById('image-modal-close');
+    
+    if (detailImage && modal && modalImage && modalClose) {
         detailImage.addEventListener('click', function () {
             const src = detailImage.getAttribute('src');
             if (src) {
@@ -300,13 +349,45 @@ document.addEventListener('DOMContentLoaded', function () {
                 modal.style.display = 'flex';
             }
         });
-
-        modal.addEventListener('click', function () {
+    
+        // ✕ボタンで閉じる
+        modalClose.addEventListener('click', function () {
             modal.style.display = 'none';
             modalImage.src = '';
         });
+    
+        // 背景クリックで閉じる（画像自体のクリックでは閉じない）
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                modalImage.src = '';
+            }
+        });
     }
     
+
+    // こちらは表示切り替え用の処理
+    const itemCards = document.querySelectorAll('.item-card');
+    const addButtonBottom = document.getElementById('add-item-button-bottom');
+    const addButtonFixed = document.getElementById('add-item-button-fixed');
+
+    const toggleAddButton = () => {
+        if (itemCards.length >= 5) {
+            addButtonBottom?.parentElement?.remove(); // 一覧下ボタン非表示
+            addButtonFixed.style.display = 'block';   // 固定ボタン表示
+        } else {
+            addButtonFixed.style.display = 'none';
+        }
+    };
+
+    toggleAddButton();
+
+    // ✅ 変数名を変更する（addButtons → addButtonTriggersなど）
+    const addButtonTriggers = [addButtonBottom, addButtonFixed];
+    addButtonTriggers.forEach(btn => {
+        btn?.addEventListener('click', createItemForm);
+    });
+
 });
 
 // カードクリック時の詳細表示
@@ -346,7 +427,6 @@ window.openDetailModal = function(item, number = '?') {
     document.getElementById('detail-number').textContent = number;
     document.getElementById('detail-name').textContent = item.name ?? 'なし';
 
-    // 日付・個数・メモ
     const expirationWrapper = document.querySelector('#detail-expiration').parentElement;
     const purchaseWrapper = document.querySelector('#detail-purchase').parentElement;
     const quantityWrapper = document.querySelector('#detail-quantity').parentElement;
@@ -368,7 +448,7 @@ window.openDetailModal = function(item, number = '?') {
         purchaseWrapper.style.display = 'none';
     }
 
-    // 所有者（グループのみ）
+    // 所有者
     if (window.currentType === 'group' && item.owner && item.owner.user_name) {
         document.getElementById('detail-owner').textContent = item.owner.user_name;
         document.getElementById('detail-owner-wrapper').style.display = 'block';
@@ -407,10 +487,44 @@ window.openDetailModal = function(item, number = '?') {
     document.getElementById('item-detail-modal').style.display = 'flex';
 };
 
-
 window.closeDetailModal = function() {
     document.getElementById('item-detail-modal').style.display = 'none';
 };
 
+document.addEventListener('DOMContentLoaded', () => {
+    const detailModal = document.getElementById('item-detail-modal');
+    const modalCard = detailModal?.querySelector('.modal-card');
+    const detailImage = document.getElementById('detail-image');
+    const imageWrapper = detailImage?.closest('.modal-image-wrapper');
+
+    if (detailModal && modalCard) {
+        // モーダル全体クリックで閉じる（ただし画像エリアは除く）
+        detailModal.addEventListener('click', (e) => {
+            const isInsideImage = imageWrapper?.contains(e.target);
+            if (!isInsideImage) {
+                closeDetailModal();
+            }
+        });
+
+        // // モーダル本体クリックは閉じ処理を止める（フォームエリアなど）
+        // modalCard.addEventListener('click', (e) => {
+        //     e.stopPropagation();
+        // });
+    }
+});
 
 
+
+// ✖ボタンで追加オーバーレイを閉じる関数
+window.closeAddForm = function () {
+    document.getElementById('add-form-overlay').style.display = 'none';
+};
+
+// オーバーレイ背景クリックで閉じる（中身を除く）
+document.addEventListener('click', function (e) {
+    const overlay = document.getElementById('add-form-overlay');
+    const card = overlay?.querySelector('.modal-card');
+    if (e.target === overlay) {
+        closeAddForm();
+    }
+});

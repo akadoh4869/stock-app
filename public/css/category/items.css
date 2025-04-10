@@ -92,7 +92,7 @@ main {
     overflow-y: auto ;
     margin-top: 120px;
     height: auto;
-    padding-bottom: 250px;
+    padding-bottom: 200px;
     
 }
 
@@ -347,9 +347,34 @@ main {
     position: relative;
 }
 
+/* 追加フォーム用モーダル（オーバーレイ全体） */
+#add-form-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* モーダルの中のフォームボックス */
+#add-form-overlay .modal-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    width: 90%;
+    max-width: 500px;
+    border: 2px solid #ff69b4;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    margin: 0; /* これがあると中央固定になる */
+}
+
+
 .line-bottom-fixed {
     position: fixed;
-    bottom: 50px;
+    bottom: 0px;
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
@@ -364,7 +389,7 @@ main {
 
 .footer-overlay-fixed.footer-stock {
     position: fixed;
-    bottom: 80px; /* 下ライン画像の上にちょうどかぶるくらい */
+    bottom: 30px; /* 下ライン画像の上にちょうどかぶるくらい */
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
@@ -414,4 +439,14 @@ main {
     box-shadow: 0 3px 6px rgba(0,0,0,0.2);
     z-index: 3;
     pointer-events: auto;
+}
+
+.add-button-bottom .pink-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background: #ff66cc;
+    border: none;
+    color: white;
+    border-radius: 25px;
+    cursor: pointer;
 }

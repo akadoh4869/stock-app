@@ -110,9 +110,9 @@ class StockController extends Controller
             'expiration_date' => 'nullable|date',
             'purchase_date' => 'nullable|date',
             'owner_id' => 'nullable|exists:users,id',
-            'image' => 'nullable|image|max:2048', // ← photo → image に修正
+            'image' => 'nullable|image|max:2048',
         ]);
-    
+
         // アイテム作成
         $item = InventoryItem::create([
             'name' => $request->name,
@@ -123,22 +123,23 @@ class StockController extends Controller
             'description' => $request->description,
             'owner_id' => $request->owner_id,
         ]);
-    
+
         // 画像保存（1枚のみ対応）
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             $path = $request->file('image')->store('item_images', 'public');
-    
+
             InventoryItemImage::create([
-                'item_id' => $item->id, // ← item_id ではなく inventory_item_id に合わせる
+                'item_id' => $item->id, // ← テーブル設計に合わせて
                 'image_path' => $path,
             ]);
         }
-    
-        return response()->json([
-            'message' => 'アイテムを保存しました',
-            'id' => $item->id,
-        ]);
+
+        // 関連データを読み込む（owner, images）
+        $item->load(['owner:id,user_name', 'images']);
+
+        return response()->json($item);
     }
+
     
 
     public function update(Request $request, InventoryItem $item)
@@ -159,26 +160,31 @@ class StockController extends Controller
     }
 
     public function uploadImage(Request $request, InventoryItem $item)
-    {
-        $request->validate([
-            'image' => 'required|image|max:2048',
-        ]);
-    
-        // 古い画像削除（1枚制限）
-        foreach ($item->images as $img) {
-            Storage::disk('public')->delete($img->image_path);
-            $img->delete();
-        }
-    
-        // 新しい画像を保存
-        $path = $request->file('image')->store('item_images', 'public');
-        InventoryItemImage::create([
-            'item_id' => $item->id,
-            'image_path' => $path,
-        ]);
-    
-        return back()->with('success', '画像を更新しました');
+{
+    $request->validate([
+        'image' => 'required|image|max:2048',
+    ]);
+
+    // 古い画像削除（1枚制限）
+    foreach ($item->images as $img) {
+        Storage::disk('public')->delete($img->image_path);
+        $img->delete();
     }
+
+    // 新しい画像保存
+    $path = $request->file('image')->store('item_images', 'public');
+
+    InventoryItemImage::create([
+        'item_id' => $item->id,  // ← カラム名に注意！（`item_id` ではなく `inventory_item_id`）
+        'image_path' => $path,
+    ]);
+
+    // ✅ JSON形式で返す
+    return response()->json([
+        'message' => '画像アップロード成功',
+        'image_path' => $path,
+    ]);
+}
     
 
     
