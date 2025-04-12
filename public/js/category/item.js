@@ -19,10 +19,14 @@ document.addEventListener('DOMContentLoaded', function () {
     function createItemForm() {
         const overlay = document.getElementById('add-form-overlay');
         const body = document.getElementById('add-form-body');
-        let ownerSelect = '';
+
+        const nextNumber = document.querySelectorAll('.item-card').length + 1;
     
+        let ownerSelect = '';
         if (window.currentType === 'group' && window.members.length > 0) {
-            ownerSelect += `<div><label>所有者：</label><select name="owner_id"><option value="">共有</option>`;
+            ownerSelect += `<div class="modal-edit-row"><label>所有者：</label>
+                <select name="owner_id" class="styled-input">
+                    <option value="">共有</option>`;
             window.members.forEach(member => {
                 ownerSelect += `<option value="${member.id}">${member.user_name}</option>`;
             });
@@ -30,21 +34,46 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     
         body.innerHTML = `
-            <div class="item-form-box" style="padding: 15px;">
-                <div><label>アイテム名：</label><input type="text" name="name" required></div>
-                <div><label>画像：</label><input type="file" name="image" accept="image/*"></div>
-                <div><label>期限日：</label><input type="date" name="expiration_date"></div>
-                <div><label>購入日：</label><input type="date" name="purchase_date"></div>
-                ${ownerSelect}
-                <div><label>個数：</label><input type="number" name="quantity" min="1" value="1" required></div>
-                <div><label>メモ：</label><textarea name="description" rows="2" style="width: 100%;"></textarea></div>
-                <div style="text-align:center; margin-top:10px;">
-                    <button type="button" id="submit-overlay-item" class="pink-button">追加</button>
+            <div class="edit-form-content">
+                <div class="edit-form-left">
+                    <div class="modal-edit-number-row">
+                        <div class="edit-number-circle">${nextNumber}</div>
+                        <input type="text" name="name" placeholder="アイテム名" class="styled-input" required>
+                    </div>
+                    <div class="modal-edit-row"><label>期限：</label><input type="date" name="expiration_date" class="styled-input"></div>
+                    <div class="modal-edit-row"><label>購入日：</label><input type="date" name="purchase_date" class="styled-input"></div>
+                    ${ownerSelect}
+                    <div class="modal-edit-row"><label>個数：</label><input type="number" name="quantity" value="1" min="1" class="styled-input" required></div>
+                    <div class="modal-edit-row"><label>メモ：</label><textarea name="description" rows="3" class="styled-input"></textarea></div>
+                </div>
+                <div class="edit-form-right">
+                    <label for="new-item-image" class="image-preview-wrapper clickable-image">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                    <input type="file" id="new-item-image" name="image" accept="image/*" class="hidden-input">
                 </div>
             </div>
+            <div class="modal-button-wrapper">
+                <button type="button" id="submit-overlay-item" class="confirm-button stock-add-button">
+                    ＋ ストック追加
+                </button>
+            </div>
         `;
+    
         overlay.style.display = 'flex';
+    
+        // メモ自動リサイズ
+        const textarea = body.querySelector('textarea[name="description"]');
+        if (textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+            textarea.addEventListener('input', function () {
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+            });
+        }
     }
+    
 
     // フォーム削除
     document.addEventListener('click', event => {
@@ -54,53 +83,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // アイテム追加
-    // document.addEventListener('click', event => {
-    //     if (event.target.classList.contains('submit-item-button')) {
-    //         const index = event.target.dataset.index;
-    //         const formBox = document.querySelector(`.item-form-box[data-index="${index}"]`);
-    //         const name = formBox.querySelector('input[name="name"]').value.trim();
-    //         const quantity = formBox.querySelector('input[name="quantity"]').value;
-    
-    //         if (!name || !quantity) {
-    //             alert('名前と個数は必須です');
-    //             return;
-    //         }
-    
-    //         const formData = new FormData();
-    //         formData.append('name', name);
-    //         formData.append('quantity', quantity);
-    //         formData.append('category_id', window.categoryId);
-    
-    //         ['expiration_date', 'purchase_date', 'owner_id', 'description'].forEach(field => {
-    //             const el = formBox.querySelector(`[name="${field}"]`);
-    //             if (el?.value) formData.append(field, el.value);
-    //         });
-    
-    //         const imageInput = formBox.querySelector('input[name="image"]');
-    //         if (imageInput?.files[0]) {
-    //             formData.append('image', imageInput.files[0]);
-    //         }
-    
-    //         formData.append('_token', csrfToken);
-    
-    //         fetch(window.itemStoreUrl, {
-    //             method: 'POST',
-    //             body: formData
-    //         })
-    //         .then(res => {
-    //             if (!res.ok) throw new Error('サーバーエラー');
-    //             return res.json();
-    //         })
-    //         .then(() => {
-    //             // 成功時にリロード
-    //             location.reload();
-    //         })
-    //         .catch(err => {
-    //             alert('保存失敗: ' + err.message);
-    //         });
-    //     }
-    // });
-
     document.addEventListener('click', event => {
         if (event.target.id === 'submit-overlay-item') {
             const formBox = document.getElementById('add-form-body');
@@ -145,34 +127,61 @@ document.addEventListener('DOMContentLoaded', function () {
    
 
     // オーバーレイを開く
-    window.openOverlay = function (item) {
-        updatedItem = structuredClone(item);
-        const overlay = document.getElementById('item-overlay');
-        const body = document.getElementById('overlay-body');
+    window.openOverlay = function (item, number = '?') {
+    updatedItem = structuredClone(item);
+    const overlay = document.getElementById('item-overlay');
+    const body = document.getElementById('overlay-body');
 
-        let ownerSelect = '';
-        if (window.currentType === 'group' && window.members.length > 0) {
-            ownerSelect += `<select name="owner_id" data-item-id="${item.id}" class="autosave-input"><option value="">共有</option>`;
-            window.members.forEach(user => {
-                ownerSelect += `<option value="${user.id}" ${user.id === item.owner_id ? 'selected' : ''}>${user.user_name}</option>`;
-            });
-            ownerSelect += `</select>`;
-        }
+    let ownerSelect = '';
+    if (window.currentType === 'group' && window.members.length > 0) {
+        ownerSelect += `<select name="owner_id" data-item-id="${item.id}" class="autosave-input styled-input"><option value="">共有</option>`;
+        window.members.forEach(user => {
+            ownerSelect += `<option value="${user.id}" ${user.id === item.owner_id ? 'selected' : ''}>${user.user_name}</option>`;
+        });
+        ownerSelect += `</select>`;
+    }
 
-        body.innerHTML = `
-            <div class="item-row"><label>名前：</label><input type="text" name="name" data-item-id="${item.id}" value="${item.name}" class="autosave-input"></div>
-            <div class="item-row"><label>期限日：</label><input type="date" name="expiration_date" data-item-id="${item.id}" value="${item.expiration_date}" class="autosave-input"></div>
-            <div class="item-row"><label>購入日：</label><input type="date" name="purchase_date" data-item-id="${item.id}" value="${item.purchase_date}" class="autosave-input"></div>
-            ${ownerSelect ? `<div class="item-row"><label>所有者：</label>${ownerSelect}</div>` : ''}
-            <div class="item-row"><label>個数：</label><input type="number" name="quantity" data-item-id="${item.id}" value="${item.quantity}" class="autosave-input"></div>
-            <div class="item-row"><label>メモ：</label><textarea name="description" data-item-id="${item.id}" class="autosave-input">${item.description ?? ''}</textarea></div>
-            <div class="item-row"><label>画像：</label>
-                <input type="file" name="image" accept="image/*" class="image-upload-input" data-item-id="${item.id}">
+    body.innerHTML = `
+        <div class="edit-form-content">
+        <div class="edit-form-left">
+           <div class="modal-edit-number-row">
+                <div class="edit-number-circle">${number}</div>
+                <input type="text" name="name" value="${item.name}" class="autosave-input styled-input name-input" data-item-id="${item.id}">
             </div>
-        `;
+            <div class="modal-edit-row"><label>期限：</label><input type="date" name="expiration_date" value="${item.expiration_date}" class="autosave-input styled-input" data-item-id="${item.id}"></div>
+            <div class="modal-edit-row"><label>購入日：</label><input type="date" name="purchase_date" value="${item.purchase_date}" class="autosave-input styled-input" data-item-id="${item.id}"></div>
+            <div class="modal-edit-row"><label>個数：</label><input type="number" name="quantity" value="${item.quantity}" class="autosave-input styled-input" data-item-id="${item.id}"></div>
+            <div class="modal-edit-row"><label>メモ：</label><textarea name="description" class="autosave-input styled-input" rows="4" data-item-id="${item.id}">${item.description ?? ''}</textarea></div>
+        </div>
+        <div class="edit-form-right">
+            <label for="edit-image-input-${item.id}" class="image-preview-wrapper clickable-image">
+            <i class="fas fa-camera"></i>
+            </label>
+            <input type="file" id="edit-image-input-${item.id}" name="image" accept="image/*"
+            class="image-upload-input styled-input hidden-input" data-item-id="${item.id}">
+        </div>
+    
+    `;
 
-        overlay.style.display = 'flex';
-    };
+    // 編集フォームを開いたあとに実行
+    const textarea = body.querySelector('textarea[name="description"]');
+    if (textarea) {
+        textarea.style.height = 'auto'; // 初期化
+        textarea.style.height = textarea.scrollHeight + 'px'; // 高さ自動調整
+
+        // 入力中も動的に変化させる
+        textarea.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    }
+
+
+  
+
+    overlay.style.display = 'flex';
+};
+
 
     // オーバーレイを閉じる
     window.closeOverlay = function () {
@@ -412,15 +421,48 @@ document.addEventListener('click', function (e) {
 });
 
 // 編集ボタンのクリック時：オーバーレイを開く
+// document.addEventListener('click', function (e) {
+//     const editBtn = e.target.closest('.edit-item-button');
+//     if (editBtn) {
+//         e.stopPropagation(); // これでカードのクリックイベントを止める
+//         const item = JSON.parse(editBtn.dataset.item);
+//         openOverlay(item);
+//         return; // 後続の処理をしない（詳細モーダルを防ぐ）
+//     }
+// });
 document.addEventListener('click', function (e) {
     const editBtn = e.target.closest('.edit-item-button');
     if (editBtn) {
-        e.stopPropagation(); // これでカードのクリックイベントを止める
+        e.stopPropagation();
         const item = JSON.parse(editBtn.dataset.item);
-        openOverlay(item);
-        return; // 後続の処理をしない（詳細モーダルを防ぐ）
+        const card = editBtn.closest('.item-card');
+        const number = card?.dataset.number ?? '?'; // ← 番号取得
+        openOverlay(item, number); // ← 番号も渡す！
+        return;
     }
 });
+
+// ✅ openDetailModal の外（上でも下でもOK）
+function applyMemoLines(text) {
+    const container = document.getElementById('detail-description');
+    container.innerHTML = ''; // 初期化
+
+    if (!text) return;
+
+    const firstLine = text.slice(0, 10);
+    const rest = text.slice(10);
+    const restLines = rest.match(/.{1,15}/g) || [];
+
+    const allLines = [firstLine, ...restLines];
+
+    allLines.forEach(line => {
+        const div = document.createElement('div');
+        div.textContent = line;
+        div.classList.add('memo-line');
+        container.appendChild(div);
+    });
+}
+
 
 
 window.openDetailModal = function(item, number = '?') {
@@ -431,6 +473,14 @@ window.openDetailModal = function(item, number = '?') {
     const purchaseWrapper = document.querySelector('#detail-purchase').parentElement;
     const quantityWrapper = document.querySelector('#detail-quantity').parentElement;
     const descriptionWrapper = document.querySelector('#detail-description').parentElement;
+
+    // 初期化（前回の情報が残らないように）
+    document.getElementById('detail-expiration').textContent = '';
+    document.getElementById('detail-purchase').textContent = '';
+    document.getElementById('detail-quantity').textContent = '';
+    document.getElementById('detail-description').textContent = '';
+    document.getElementById('detail-owner').textContent = '';
+    document.getElementById('detail-image').src = '';
 
     // 期限日
     if (item.expiration_date) {
@@ -456,23 +506,38 @@ window.openDetailModal = function(item, number = '?') {
         document.getElementById('detail-owner-wrapper').style.display = 'none';
     }
 
-    // 個数
-    if (item.quantity) {
+    // 個数（0も表示する）
+    if (item.quantity !== null && item.quantity !== undefined) {
         document.getElementById('detail-quantity').textContent = item.quantity;
         quantityWrapper.style.display = 'block';
     } else {
         quantityWrapper.style.display = 'none';
     }
 
-    // メモ
-    if (item.description) {
-        document.getElementById('detail-description').textContent = item.description;
+    // メモ（空白のみの場合も非表示）
+    // function formatMemo(text) {
+    //     if (!text) return '';
+    
+    //     const firstLineLimit = 10;
+    //     const restLineLimit = 15;
+    
+    //     const firstLine = text.slice(0, firstLineLimit);
+    //     const rest = text.slice(firstLineLimit);
+    
+    //     const restLines = rest.match(new RegExp(`.{1,${restLineLimit}}`, 'g')) || [];
+    
+    //     return [firstLine, ...restLines].join('\n');
+    // }
+
+    // メモ（空白のみの場合も非表示）
+    if (item.description && item.description.trim() !== '') {
+        applyMemoLines(item.description);
         descriptionWrapper.style.display = 'block';
     } else {
         descriptionWrapper.style.display = 'none';
     }
 
-    // 画像
+    // 画像表示
     const imageEl = document.getElementById('detail-image');
     const placeholder = document.getElementById('detail-no-image');
     if (item.images && item.images.length > 0) {
@@ -486,6 +551,7 @@ window.openDetailModal = function(item, number = '?') {
 
     document.getElementById('item-detail-modal').style.display = 'flex';
 };
+
 
 window.closeDetailModal = function() {
     document.getElementById('item-detail-modal').style.display = 'none';
