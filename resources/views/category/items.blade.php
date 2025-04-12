@@ -149,17 +149,24 @@
                         <div class="modal-name" id="detail-name"></div>
                     </div>
 
-                    <div class="modal-image-wrapper">
-                        <img id="detail-image" src="" alt="画像" style="display: none;">
-                        <div id="detail-no-image" class="modal-image-placeholder"><i class="fas fa-camera"></i></div>
-                    </div>
-
-                    <div class="modal-info">
-                        <div><strong>期限日：</strong><span id="detail-expiration"></span></div>
-                        <div><strong>購入日：</strong><span id="detail-purchase"></span></div>
-                        <div id="detail-owner-wrapper" style="display: none;"><strong>所有者：</strong><span id="detail-owner"></span></div>
-                        <div><strong>個数：</strong><span id="detail-quantity"></span></div>
-                        <div><strong>メモ：</strong><div id="detail-description" style="white-space: pre-wrap;"></div></div>
+                    <div class="modal-info">    
+                        <div class="modal-text">
+                            <div><strong>期限日：</strong><span id="detail-expiration"></span></div>
+                            <div><strong>購入日：</strong><span id="detail-purchase"></span></div>
+                            <div id="detail-owner-wrapper" style="display: none;"><strong>所有者：</strong><span id="detail-owner"></span></div>
+                            <div><strong>個数：</strong><span id="detail-quantity"></span></div>
+                            <div class="memo-block">
+                                <strong>メモ：</strong>
+                                <div id="detail-description" class="memo-lines"></div>
+                            </div>
+                            
+                              
+                        </div>
+                        <div class="modal-image-wrapper">
+                            <img id="detail-image" src="" alt="画像" style="display: none;">
+                            <div id="detail-no-image" class="modal-image-placeholder"><i class="fas fa-camera"></i></div>
+                        </div>
+                        
                     </div>
                 </div>
             </div>
