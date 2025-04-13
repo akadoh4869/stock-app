@@ -226,6 +226,29 @@ class StockController extends Controller
     
         return back()->with('success', 'アイテムを完全に削除しました');
     }
+
+    public function bulkStore(Request $request)
+    {
+        $categoryId = $request->input('category_id');
+        $items = $request->input('items', []);
+
+        foreach ($items as $data) {
+            if (!empty($data['name'])) {
+                InventoryItem::create([
+                    'category_id'    => $categoryId,
+                    'name'           => $data['name'],
+                    'quantity'       => $data['quantity'] ?? 1,
+                    'expiration_date'=> $data['expiration_date'] ?? null,
+                    'purchase_date'  => $data['purchase_date'] ?? null,
+                    'description'    => $data['memo'] ?? null,
+                    'owner_id'       => $data['owner_id'] ?? null,
+                ]);
+            }
+        }
+
+        return redirect()->route('item.index', ['category' => $categoryId])
+            ->with('success', 'ストックを一括作成しました');
+    }
     
     
 

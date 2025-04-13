@@ -242,6 +242,18 @@ class CategoryController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function bulkCreate(Request $request)
+    {
+        $category = InventoryCategory::findOrFail($request->category_id);
+        $currentGroup = session('current_group_id') ? Group::with('users')->find(session('current_group_id')) : null;
+
+        return view('category.create', [
+            'category' => $category,
+            'currentGroup' => $currentGroup,
+            'currentType' => session('current_type'),
+        ]);
+    }
+
 
 
 

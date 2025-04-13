@@ -31,7 +31,16 @@
         </div>
         <div class="main">
             @if($items->isEmpty())
-                {{-- <p style="text-align: center;">このカテゴリにはアイテムがありません。</p> --}}
+                <div class="bulk-buttons" style="text-align: center; margin-top: 20px;">
+                    {{-- 一括追加ボタン --}}
+                    <a href="{{ route('category.bulkCreate', ['category_id' => $category->id]) }}" class="blue-button" style="text-align:center; margin-top: 20px;">
+                        <i class="fa fa-plus"></i>ストック一括追加
+                    </a>
+                    {{-- 通常のストック追加 --}}
+                    <button class="pink-button" id="add-item-button-bottom">
+                        <i class="fa fa-plus"></i> ストック追加
+                    </button>
+                </div>
             @else
                 <div style="max-width: 400px; margin: 0 auto;">
                     @foreach($items as $index => $item)
@@ -90,6 +99,12 @@
                     
                     @endforeach
                 </div>
+                {{-- 一覧下に表示するボタン（デフォルト表示） --}}
+                <div id="bottom-add-button" class="add-button-bottom" style="text-align: center; margin-top: 20px;">
+                    <button class="pink-button" id="add-item-button-bottom">
+                        <i class="fa fa-plus"></i> ストック追加
+                    </button>
+                </div>
             @endif
         
             <form method="POST" action="{{ route('item.store') }}" enctype="multipart/form-data" style="max-width: 600px; margin: 0 auto;">
@@ -98,12 +113,7 @@
                 <div id="item-form-container"></div>
                 <div style="text-align: center; margin-top: 10px;"></div>
             </form>
-            {{-- 一覧下に表示するボタン（デフォルト表示） --}}
-            <div id="bottom-add-button" class="add-button-bottom" style="text-align: center; margin-top: 20px;">
-                <button class="pink-button" id="add-item-button-bottom">
-                    <i class="fa fa-plus"></i> ストック追加
-                </button>
-            </div>
+            
         </div>
         
         <!-- フッター背景画像（画面最下部に固定） -->
