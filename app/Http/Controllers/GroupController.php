@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Group;
@@ -45,7 +46,8 @@ class GroupController extends Controller
         $groupId = $request->input('group_id');
         $inviterId = Auth::id();
     
-        $alreadyMember = \DB::table('group_members')
+        // すでにメンバーならスキップ
+        $alreadyMember = DB::table('group_members')
             ->where('group_id', $groupId)
             ->where('user_id', $userId)
             ->exists();
@@ -54,32 +56,38 @@ class GroupController extends Controller
             return redirect()->route('group.invite')->with('info', 'すでにメンバーです');
         }
     
-        $existingInvitation = GroupInvitation::where('group_id', $groupId)
+        // すでに招待されているかチェック（グループ×ユーザーで1件のみ取得）
+        $existingInvite = GroupInvitation::where('group_id', $groupId)
             ->where('invitee_id', $userId)
             ->first();
     
-        if ($existingInvitation) {
-            $existingInvitation->update([
-                'status' => 'pending',
-                'inviter_id' => $inviterId,
-            ]);
-    
-            // ✅ 再送でもイベント発火
-            // event(new InvitationSent($existingInvitation));
+        if ($existingInvite) {
+            if ($existingInvite->status === 'pending' && is_null($existingInvite->responded_at)) {
+                // ✅ 保留中 → updated_atだけ更新
+                $existingInvite->touch();
+            } else {
+                // ✅ 辞退済みまたは以前に保留して非表示状態 → 再招待（responded_atリセット）
+                $existingInvite->update([
+                    'status' => 'pending',
+                    'inviter_id' => $inviterId,
+                    'responded_at' => null,
+                ]);
+            }
         } else {
-            $invitation = GroupInvitation::create([
+            // ✅ 新規招待
+            GroupInvitation::create([
                 'group_id' => $groupId,
                 'invitee_id' => $userId,
                 'inviter_id' => $inviterId,
                 'status' => 'pending',
             ]);
-    
-            // ✅ 新規招待でもイベント発火
-            // event(new InvitationSent($invitation));
         }
     
         return redirect()->route('group.invite')->with('success', 'ユーザーを招待しました');
     }
+    
+
+    
     
     public function respond(Request $request)
     {
@@ -87,29 +95,65 @@ class GroupController extends Controller
             'invitation_id' => 'required|exists:group_invitations,id',
             'response' => 'required|in:accept,decline',
         ]);
-
-        $invitation = \App\Models\GroupInvitation::findOrFail($request->invitation_id);
-
-        // すでに対応済みならスルー
-        if ($invitation->status !== 'pending') { // ← 修正点
+    
+        $invitation = GroupInvitation::findOrFail($request->invitation_id);
+    
+        if ($invitation->status !== 'pending') {
             return redirect()->route('stock.index');
         }
-
+    
         if ($request->response === 'accept') {
-            // グループ参加処理
-            \DB::table('group_members')->insert([
+            DB::table('group_members')->insert([
                 'group_id' => $invitation->group_id,
-                'user_id' => $invitation->invitee_id, // ← user_id → invitee_id に修正！
+                'user_id' => $invitation->invitee_id,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-            $invitation->update(['status' => 'accepted']); // ← 修正点
+            $invitation->update(['status' => 'accepted', 'responded_at' => now()]);
         } else {
-            $invitation->update(['status' => 'declined']); // ← 修正点
+            // ❗辞退時にレコード削除
+            $invitation->delete();
         }
-
+    
         return redirect()->route('stock.index')->with('success', '対応しました');
     }
+    
+    
+    // public function markViewed(Request $request)
+    // {
+    //     $request->validate([
+    //         'invitation_ids' => 'required|array',
+    //         'invitation_ids.*' => 'exists:group_invitations,id',
+    //     ]);
+    
+    //     GroupInvitation::whereIn('id', $request->invitation_ids)
+    //         ->where('invitee_id', Auth::id())
+    //         ->update(['responded_at' => now()]);
+    
+    //     return redirect()->route('stock.index');
+    // }
+    public function markViewed(Request $request)
+{
+    $request->validate([
+        'invitation_ids' => 'required|array',
+        'invitation_ids.*' => 'exists:group_invitations,id',
+    ]);
+
+    $count = GroupInvitation::whereIn('id', $request->invitation_ids)
+        ->where('invitee_id', Auth::id())
+        ->update(['responded_at' => now()]);
+
+    \Log::info("【保留処理】{$count} 件の responded_at を更新", $request->invitation_ids);
+
+    // fetch対応 or redirect両方対応
+    if ($request->expectsJson()) {
+        return response()->json(['status' => 'ok', 'updated' => $count]);
+    }
+
+    return redirect()->route('stock.index');
+}
+
+    
 
     public function leave($groupId)
     {

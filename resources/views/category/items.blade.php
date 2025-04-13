@@ -23,9 +23,10 @@
                     <h2 class="page-title">{{ $category->name }} のストック</h2>
         
                     <!-- ハンバーガー -->
-                    <div class="hamburger-menu" onclick="toggleMenu()">
+                    <div class="hamburger-menu">
                         <i class="fa-solid fa-bars"></i>
                     </div>
+                    
                 </div>
             </div>
         </div>
@@ -197,6 +198,20 @@
                 <div id="add-form-body"></div>
             </div>
         </div>
+
+        <!-- 🔍 検索オーバーレイ -->
+        <div id="search-overlay" class="search-overlay">
+            <div class="search-header">
+                <input type="text" id="search-input"
+                    placeholder="{{ $currentType === 'group' ? 'キーワードまたは所有者名を検索' : 'キーワードを検索' }}">
+                <button onclick="closeSearchOverlay()">✕</button>
+            </div>
+            <div id="search-results" class="search-results">
+                <!-- 検索結果がここに表示されます -->
+            </div>
+        </div>
+        
+
 
         
     </main>

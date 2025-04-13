@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SettingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -99,5 +100,9 @@ Route::middleware(['auth'])->group(function () {
     // web.php
     Route::post('/items/bulk-store', [StockController::class, 'bulkStore'])->name('item.bulkStore');
 
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings');
+
+    Route::post('/invitation/respond', [GroupController::class, 'respond'])->name('invitation.respond');
+    Route::post('/invitation/viewed', [GroupController::class, 'markViewed'])->name('invitation.markViewed');
 
 });

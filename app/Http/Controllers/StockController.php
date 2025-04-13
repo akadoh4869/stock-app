@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Group;
 use App\Models\Inventory;
@@ -21,8 +22,8 @@ class StockController extends Controller
         if (!$user) {
             return redirect()->route('login')->with('error', 'ログインしてください');
         }
-
-        // セッション初期化
+    
+        // セッション初期化（最初の訪問時のみ）
         if (!session()->has('current_type')) {
             session([
                 'current_type' => 'personal',
@@ -30,20 +31,19 @@ class StockController extends Controller
                 'current_group_id' => null
             ]);
         }
-
+    
         $currentType = session('current_type');
         $currentInventoryId = session('current_inventory_id');
         $currentGroupId = session('current_group_id');
-
+    
         // 所属グループ取得
         $groups = $user->groups()->get();
-
+    
         // 現在のグループ
-        $currentGroup = null;
-        if ($currentType === 'group' && !empty($currentGroupId)) {
-            $currentGroup = $groups->firstWhere('id', $currentGroupId);
-        }
-
+        $currentGroup = $currentType === 'group' && !empty($currentGroupId)
+            ? $groups->firstWhere('id', $currentGroupId)
+            : null;
+    
         // 現在の在庫
         $inventory = null;
         if ($currentType === 'personal' && $currentInventoryId) {
@@ -51,22 +51,32 @@ class StockController extends Controller
         } elseif ($currentType === 'group' && $currentGroupId) {
             $inventory = Inventory::where('group_id', $currentGroupId)->first();
         }
-
+    
         // カテゴリ取得
-        $categories = [];
-        if ($inventory) {
-            $categories = InventoryCategory::where('inventory_id', $inventory->id)->get();
-        }
-
+        $categories = $inventory
+            ? InventoryCategory::where('inventory_id', $inventory->id)->get()
+            : [];
+    
         // 個人スペース一覧
         $personalInventories = Inventory::where('owner_id', $user->id)->get();
-
-        // 招待取得
-        $pendingInvitations = GroupInvitation::where('invitee_id', $user->id)
-            ->where('status', 'pending')
-            ->with('group')
-            ->get();
-
+    
+        // ✅ 招待一覧（未対応のものだけ）
+        $pendingInvitations = GroupInvitation::where('invitee_id', Auth::id())
+        ->where('status', 'pending')
+        ->whereNull('responded_at') // ← これがないと再表示されます！
+        ->orderByDesc('updated_at')
+        ->with('group')
+        ->get();
+    
+        // ✅ 所属スペースの合計数（上限判断用）
+        $groupCount = DB::table('group_members')
+            ->where('user_id', $user->id)
+            ->count();
+    
+        $personalCount = $personalInventories->count();
+    
+        $totalSpaceCount = $groupCount + $personalCount;
+    
         return view('users.top', [
             'user' => $user,
             'groups' => $groups,
@@ -75,9 +85,11 @@ class StockController extends Controller
             'categories' => $categories,
             'currentType' => $currentType,
             'inventory' => $inventory,
-            'pendingInvitations' => $pendingInvitations
+            'pendingInvitations' => $pendingInvitations,
+            'totalSpaceCount' => $totalSpaceCount,
         ]);
     }
+    
 
     public function switchSpace(Request $request)
     {
@@ -246,10 +258,9 @@ class StockController extends Controller
             }
         }
 
-        return redirect()->route('item.index', ['category' => $categoryId])
+        return redirect()->route('stock.index', ['category' => $categoryId])
             ->with('success', 'ストックを一括作成しました');
     }
-    
     
 
 }
