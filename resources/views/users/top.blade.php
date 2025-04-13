@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="{{ asset('css/users/top.css')}}"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="mark-viewed-route" content="{{ route('invitation.markViewed') }}">
+    <meta name="user-id" content="{{ Auth::id() }}">
     <title>トップページ</title>
 </head>
 <body>
@@ -58,7 +60,7 @@
                     @endforeach
     
                     <!-- グループ一覧の最後に表示 -->
-                    @if(($personalInventories->count() + $groups->count()) < 5)
+                    @if(($personalInventories->count() + $groups->count()) < 3)
                         <div class="add-space-container">
                             <button onclick="window.location.href='{{ route('group.create.form') }}'" class="add-space-button-no-border">
                                 <i class="fa-solid fa-circle-plus"></i> グループを追加
@@ -170,192 +172,59 @@
             </button>
         </div>
 
-    
         @if($pendingInvitations->isNotEmpty())
-        <div id="invitation-popup" class="popup">
-            <h3>グループ招待があります</h3>
-            @foreach($pendingInvitations as $invitation)
-                <div class="invitation-box">
-                    <p>「{{ $invitation->group->name }}」に参加しますか？</p>
-                    <form action="{{ route('invitation.respond') }}" method="POST" style="display:inline;">
+            <div id="invitation-popup-overlay" class="invitation-popup-overlay">
+                <div id="invitation-popup" class="invitation-popup">
+                    <!-- ×ボタン（全招待を保留にする） -->
+                    <button id="close-popup" class="invitation-close-btn">×</button>
+                    <h3>グループ招待があります</h3>
+
+                    @foreach($pendingInvitations as $invitation)
+                        <div class="invitation-box">
+                            <p>「{{ $invitation->group->name }}」に参加しますか？</p>
+
+                            @if($totalSpaceCount < 3)
+                                <form action="{{ route('invitation.respond') }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    <input type="hidden" name="invitation_id" value="{{ $invitation->id }}">
+                                    <button name="response" value="accept">参加</button>
+                                    <button name="response" value="decline">辞退</button>
+                                </form>
+                            @else
+                                <form action="{{ route('invitation.markViewed') }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    <input type="hidden" name="invitation_ids[]" value="{{ $invitation->id }}">
+                                    <button type="submit" value="pending">保留</button>
+                                </form>
+
+                                <form action="{{ route('invitation.respond') }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    <input type="hidden" name="invitation_id" value="{{ $invitation->id }}">
+                                    <button name="response" value="decline">辞退</button>
+                                </form>
+                            @endif
+                        </div>
+                    @endforeach
+
+                    <!-- hidden form for × ボタン一括保留 -->
+                    <form id="close-popup-form" action="{{ route('invitation.markViewed') }}" method="POST" style="display: none;">
                         @csrf
-                        <input type="hidden" name="invitation_id" value="{{ $invitation->id }}">
-                        <button name="response" value="accept">参加</button>
-                        <button name="response" value="decline">辞退</button>
+                        @foreach($pendingInvitations as $invitation)
+                            <input type="hidden" name="invitation_ids[]" value="{{ $invitation->id }}">
+                        @endforeach
                     </form>
                 </div>
-            @endforeach
-        </div>
+            </div>
         @endif
-    
         <br>
         <br>
-        
-
     </main>
-    
-    
 
     <!-- CDN読み込み（Echo & Pusher） -->
     <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/laravel-echo/dist/echo.iife.js"></script>
-
-    <script>
-
-        let startX = 0;
-
-        function handleTouchStart(e) {
-            startX = e.touches[0].clientX;
-        }
-
-        function handleTouchMove(e, element) {
-            const deltaX = e.touches[0].clientX - startX;
-            if (deltaX < -50) {
-                element.classList.add('swiped');
-            } else if (deltaX > 50) {
-                element.classList.remove('swiped');
-            }
-        }
-
-        function handleTouchEnd(e, element) {
-            // no-op
-        }
-
-
-        // スペース切り替えポップアップを開く
-        document.getElementById('user-name-toggle').addEventListener('click', function () {
-            document.getElementById('space-popup-overlay').style.display = 'flex';
-        });
-
-        // オーバーレイをクリックしたら閉じる
-        document.getElementById('space-popup-overlay').addEventListener('click', function (e) {
-            if (e.target.id === 'space-popup-overlay') {
-                e.target.style.display = 'none';
-            }
-        });
-
-        // 削除確認
-        function confirmDelete(itemCount) {
-            if (itemCount > 0) {
-                return confirm('このカテゴリにはアイテムが含まれています。一括削除してもよろしいですか？');
-            } else {
-                return confirm('このカテゴリを削除しますか？');
-            }
-        }
-        
-        // Echo 初期化
-        window.Echo = new Echo({
-            broadcaster: 'pusher',
-            key: 'local',
-            wsHost: '127.0.0.1',
-            wsPort: 6001,
-            forceTLS: false,
-            disableStats: true,
-            enabledTransports: ['ws'], // ← WebSocketのみに限定
-        });
-
-        // ユーザーごとのプライベートチャンネルでリアルタイム通知受信
-        Echo.private(`user.{{ Auth::id() }}`)
-            .listen('.InvitationSent', (e) => {
-                const token = '{{ csrf_token() }}';
-                const popup = document.getElementById('invitation-popup');
-
-                const box = document.createElement('div');
-                box.classList.add('invitation-box');
-                box.innerHTML = `
-                    <p>「${e.group_name}」に参加しますか？</p>
-                    <form action="{{ route('invitation.respond') }}" method="POST" style="display:inline;">
-                        <input type="hidden" name="_token" value="${token}">
-                        <input type="hidden" name="invitation_id" value="${e.invitation_id}">
-                        <button name="response" value="accept">参加</button>
-                        <button name="response" value="decline">辞退</button>
-                    </form>
-                `;
-
-                if (popup) {
-                    popup.appendChild(box);
-                    popup.style.display = 'block';
-                } else {
-                    const newPopup = document.createElement('div');
-                    newPopup.id = 'invitation-popup';
-                    newPopup.classList.add('popup');
-                    newPopup.innerHTML = `<h3>グループ招待があります</h3>`;
-                    newPopup.appendChild(box);
-                    document.body.appendChild(newPopup);
-                }
-            });
-
-            function handleCategorySubmit(event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    event.target.closest('form').submit();
-                }
-            }
-
-            document.getElementById('new-category-name').addEventListener('blur', function () {
-            const input = this;
-            const name = input.value.trim();
-
-            if (name === '') return;
-
-            fetch('/category/store', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({
-                    category_name: name,
-                    inventory_id: '{{ $inventory->id ?? '' }}'
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.id && data.name) {
-                    const categoryList = document.querySelector('.category-list');
-
-                    // 新しいカテゴリの li を作成
-                    const li = document.createElement('li');
-                    li.classList.add('category-item');
-                    li.dataset.id = data.id;
-
-                    const dot = document.createElement('div');
-                    dot.classList.add('category-dot');
-                    dot.style.backgroundColor = (categoryList.children.length % 2 === 0) ? 'pink' : 'cyan';
-
-                    const content = document.createElement('div');
-                    content.classList.add('category-content');
-                    content.style.borderColor = (categoryList.children.length % 2 === 0) ? 'cyan' : 'hotpink';
-
-                    const span = document.createElement('span');
-                    span.classList.add('category-name');
-                    span.textContent = data.name;
-
-                    const count = document.createElement('span');
-                    count.classList.add('category-count');
-                    count.textContent = '（0）';
-
-                    const inputEdit = document.createElement('input');
-                    inputEdit.classList.add('category-edit-input');
-                    inputEdit.type = 'text';
-                    inputEdit.value = data.name;
-                    inputEdit.style.display = 'none';
-
-                    content.appendChild(span);
-                    content.appendChild(inputEdit);
-                    content.appendChild(count);
-
-                    li.appendChild(dot);
-                    li.appendChild(content);
-
-                    categoryList.appendChild(li);
-                }
-
-                input.value = '';
-            });
-        });
-
-    </script>
+    <script src="{{ asset('js/users/top.js') }}"></script>
+    
     
 </body>
 </html>

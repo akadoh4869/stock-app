@@ -128,59 +128,65 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // オーバーレイを開く
     window.openOverlay = function (item, number = '?') {
-    updatedItem = structuredClone(item);
-    const overlay = document.getElementById('item-overlay');
-    const body = document.getElementById('overlay-body');
-
-    let ownerSelect = '';
-    if (window.currentType === 'group' && window.members.length > 0) {
-        ownerSelect += `<select name="owner_id" data-item-id="${item.id}" class="autosave-input styled-input"><option value="">共有</option>`;
-        window.members.forEach(user => {
-            ownerSelect += `<option value="${user.id}" ${user.id === item.owner_id ? 'selected' : ''}>${user.user_name}</option>`;
-        });
-        ownerSelect += `</select>`;
-    }
-
-    body.innerHTML = `
-        <div class="edit-form-content">
-        <div class="edit-form-left">
-           <div class="modal-edit-number-row">
-                <div class="edit-number-circle">${number}</div>
-                <input type="text" name="name" value="${item.name}" class="autosave-input styled-input name-input" data-item-id="${item.id}">
-            </div>
-            <div class="modal-edit-row"><label>期限：</label><input type="date" name="expiration_date" value="${item.expiration_date}" class="autosave-input styled-input" data-item-id="${item.id}"></div>
-            <div class="modal-edit-row"><label>購入日：</label><input type="date" name="purchase_date" value="${item.purchase_date}" class="autosave-input styled-input" data-item-id="${item.id}"></div>
-            <div class="modal-edit-row"><label>個数：</label><input type="number" name="quantity" value="${item.quantity}" class="autosave-input styled-input" data-item-id="${item.id}"></div>
-            <div class="modal-edit-row"><label>メモ：</label><textarea name="description" class="autosave-input styled-input" rows="4" data-item-id="${item.id}">${item.description ?? ''}</textarea></div>
-        </div>
-        <div class="edit-form-right">
-            <label for="edit-image-input-${item.id}" class="image-preview-wrapper clickable-image">
-            <i class="fas fa-camera"></i>
-            </label>
-            <input type="file" id="edit-image-input-${item.id}" name="image" accept="image/*"
-            class="image-upload-input styled-input hidden-input" data-item-id="${item.id}">
-        </div>
+        updatedItem = structuredClone(item);
+        const overlay = document.getElementById('item-overlay');
+        const body = document.getElementById('overlay-body');
     
-    `;
+        // 所有者セレクトボックス（グループ時のみ表示）
+        let ownerSelect = '';
+        if (window.currentType === 'group' && window.members.length > 0) {
+            ownerSelect += `
+                <div class="modal-edit-row">
+                    <label>所有者：</label>
+                    <select name="owner_id" data-item-id="${item.id}" class="autosave-input styled-input">
+                        <option value="">共有</option>
+                        ${window.members.map(user => `
+                            <option value="${user.id}" ${user.id === item.owner_id ? 'selected' : ''}>
+                                ${user.user_name}
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+            `;
+        }
 
-    // 編集フォームを開いたあとに実行
-    const textarea = body.querySelector('textarea[name="description"]');
-    if (textarea) {
-        textarea.style.height = 'auto'; // 初期化
-        textarea.style.height = textarea.scrollHeight + 'px'; // 高さ自動調整
+        // 編集フォーム本体
+        body.innerHTML = `
+            <div class="edit-form-content">
+                <div class="edit-form-left">
+                    <div class="modal-edit-number-row"><div class="edit-number-circle">${number}</div><input type="text" name="name" value="${item.name}" class="autosave-input styled-input name-input" data-item-id="${item.id}"></div>
+                    <div class="modal-edit-row"><label>期限：</label><input type="date" name="expiration_date" value="${item.expiration_date}" class="autosave-input styled-input" data-item-id="${item.id}"></div>
+                    <div class="modal-edit-row"><label>購入日：</label><input type="date" name="purchase_date" value="${item.purchase_date}" class="autosave-input styled-input" data-item-id="${item.id}"></div>
+                    <div class="modal-edit-row"><label>個数：</label><input type="number" name="quantity" value="${item.quantity}" class="autosave-input styled-input" data-item-id="${item.id}"></div>
+                    ${ownerSelect}
+                    <div class="modal-edit-row"><label>メモ：</label><textarea name="description" class="autosave-input styled-input" rows="4" data-item-id="${item.id}">${item.description ?? ''}</textarea></div>
+                </div>
 
-        // 入力中も動的に変化させる
-        textarea.addEventListener('input', function () {
-            this.style.height = 'auto';
-            this.style.height = this.scrollHeight + 'px';
-        });
-    }
+                <div class="edit-form-right">
+                    <label for="edit-image-input-${item.id}" class="image-preview-wrapper clickable-image">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                    <input type="file" id="edit-image-input-${item.id}" name="image" accept="image/*"
+                        class="image-upload-input styled-input hidden-input" data-item-id="${item.id}">
+                </div>
+            </div>
+        `;
 
+        // 編集フォームを開いたあとに実行
+        const textarea = body.querySelector('textarea[name="description"]');
+        if (textarea) {
+            textarea.style.height = 'auto'; // 初期化
+            textarea.style.height = textarea.scrollHeight + 'px'; // 高さ自動調整
 
-  
+            // 入力中も動的に変化させる
+            textarea.addEventListener('input', function () {
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+            });
+        }
 
-    overlay.style.display = 'flex';
-};
+        overlay.style.display = 'flex';
+    };
 
 
     // オーバーレイを閉じる
@@ -421,15 +427,6 @@ document.addEventListener('click', function (e) {
 });
 
 // 編集ボタンのクリック時：オーバーレイを開く
-// document.addEventListener('click', function (e) {
-//     const editBtn = e.target.closest('.edit-item-button');
-//     if (editBtn) {
-//         e.stopPropagation(); // これでカードのクリックイベントを止める
-//         const item = JSON.parse(editBtn.dataset.item);
-//         openOverlay(item);
-//         return; // 後続の処理をしない（詳細モーダルを防ぐ）
-//     }
-// });
 document.addEventListener('click', function (e) {
     const editBtn = e.target.closest('.edit-item-button');
     if (editBtn) {
@@ -515,21 +512,6 @@ window.openDetailModal = function(item, number = '?') {
     }
 
     // メモ（空白のみの場合も非表示）
-    // function formatMemo(text) {
-    //     if (!text) return '';
-    
-    //     const firstLineLimit = 10;
-    //     const restLineLimit = 15;
-    
-    //     const firstLine = text.slice(0, firstLineLimit);
-    //     const rest = text.slice(firstLineLimit);
-    
-    //     const restLines = rest.match(new RegExp(`.{1,${restLineLimit}}`, 'g')) || [];
-    
-    //     return [firstLine, ...restLines].join('\n');
-    // }
-
-    // メモ（空白のみの場合も非表示）
     if (item.description && item.description.trim() !== '') {
         applyMemoLines(item.description);
         descriptionWrapper.style.display = 'block';
@@ -594,3 +576,97 @@ document.addEventListener('click', function (e) {
         closeAddForm();
     }
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const hamburger = document.querySelector('.hamburger-menu');
+    const searchOverlay = document.getElementById('search-overlay');
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+
+    // メニュークリックで開く
+    hamburger.addEventListener('click', () => {
+        searchOverlay.classList.add('open');
+        searchInput.focus();
+    });
+
+    // 検索処理
+    searchInput.addEventListener('input', function () {
+        const keyword = this.value.toLowerCase();
+        const results = [];
+
+        window.items.forEach(item => {
+            const nameMatch = item.name?.toLowerCase().includes(keyword);
+            const descMatch = item.description?.toLowerCase().includes(keyword);
+            const ownerMatch = window.currentType === 'group' &&
+                window.members?.find(m => m.id === item.owner_id && m.user_name.toLowerCase().includes(keyword));
+
+            if (nameMatch || descMatch || ownerMatch) {
+                results.push(item);
+            }
+        });
+
+        renderSearchResults(results);
+    });
+
+    // 結果を表示
+    function renderSearchResults(results) {
+        const searchResults = document.getElementById('search-results');
+        searchResults.innerHTML = '';
+    
+        if (results.length === 0) {
+            searchResults.innerHTML = '<p>該当なし</p>';
+            return;
+        }
+    
+        results.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'search-result-item';
+        
+            const ownerLine = window.currentType === 'group'
+                ? `<small>所有者: ${item.owner?.user_name ?? '共有'}</small><br>`
+                : '';
+        
+            div.innerHTML = `
+                <div style="border-bottom: 1px solid #ccc; padding: 10px; cursor: pointer;">
+                    <strong>${item.name}</strong><br>
+                    ${ownerLine}
+                </div>
+            `;
+        
+            // ✅ クリックで詳細モーダルを開く
+            div.addEventListener('click', () => {
+                window.openDetailModal(item, index + 1);
+            });
+        
+            searchResults.appendChild(div);
+        });
+        
+    }
+    
+});
+
+// 閉じる関数
+function closeSearchOverlay() {
+    document.getElementById('search-overlay').classList.remove('open');
+}
+
+// 検索結果のアイテムを動的に作成する例
+function showSearchResults(results) {
+    const container = document.getElementById('search-result-container');
+    container.innerHTML = ''; // 一度クリア
+
+    results.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'search-result-item';
+        div.textContent = item.name ?? '（名前なし）';
+
+        // ✅ クリックで詳細モーダル表示
+        div.addEventListener('click', () => {
+            window.openDetailModal(item, '?');
+        });
+
+        container.appendChild(div);
+    });
+
+    container.style.display = 'block'; // 結果を表示
+}
