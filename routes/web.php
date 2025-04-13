@@ -94,4 +94,10 @@ Route::middleware(['auth'])->group(function () {
     // web.php
     Route::post('/category/update/{id}', [CategoryController::class, 'updateName']);
 
+    Route::get('/category/bulk-create', [CategoryController::class, 'bulkCreate'])->name('category.bulkCreate');
+
+    // web.php
+    Route::post('/items/bulk-store', [StockController::class, 'bulkStore'])->name('item.bulkStore');
+
+
 });
