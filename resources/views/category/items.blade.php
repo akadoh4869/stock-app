@@ -221,8 +221,9 @@
         window.members = @json($currentGroup?->users->makeVisible(['user_name']) ?? []);
         window.categoryId = {{ $category->id }};
         window.itemStoreUrl = "{{ route('item.store') }}";
-        window.items = @json($items);
+        window.items = @json($itemsForJs); // ← ✅ JS専用に整形された配列
     </script>
+    
     
     <script src="{{ asset('js/category/item.js') }}"></script>
 

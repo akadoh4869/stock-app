@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage; // ✅ ← これを追加
 use App\Models\Group;
 use App\Models\Inventory;
 use App\Models\InventoryCategory;
@@ -101,25 +102,45 @@ class CategoryController extends Controller
     public function showItems($id)
     {
         $user = Auth::user();
-        
-        // ✅ images を eager load
+    
+        // Blade表示用（元のまま）
         $category = InventoryCategory::with(['items.owner', 'items.images'])->findOrFail($id);
-
+    
         $currentType = session('current_type');
         $currentGroupId = session('current_group_id');
         $currentGroup = null;
-
+    
         if ($currentType === 'group' && $currentGroupId) {
             $currentGroup = $user->groups()->where('groups.id', $currentGroupId)->first();
         }
-
+    
+        // JS用データだけ個別で配列化
+        $itemsForJs = $category->items->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'quantity' => $item->quantity,
+                'expiration_date' => $item->expiration_date,
+                'purchase_date' => $item->purchase_date,
+                'description' => $item->description,
+                'owner_id' => $item->owner_id,
+                'owner' => $item->owner ? ['user_name' => $item->owner->user_name] : null,
+                'images' => $item->images->map(fn($img) => ['image_path' => $img->image_path]),
+                'image_url' => $item->images->first()?->image_path
+                    ? Storage::url($item->images->first()->image_path)
+                    : '',
+            ];
+        });
+    
         return view('category.items', [
             'category' => $category,
-            'items' => $category->items,
+            'items' => $category->items,        // Blade用（Eloquentコレクション）
+            'itemsForJs' => $itemsForJs,        // JS用（配列に変換）
             'currentType' => $currentType,
             'currentGroup' => $currentGroup,
         ]);
     }
+    
 
 
     public function destroy($id)
