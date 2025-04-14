@@ -35,11 +35,11 @@ document.addEventListener('DOMContentLoaded', function () {
     
         body.innerHTML = `
             <div class="edit-form-content">
+                <div class="modal-edit-number-row">
+                    <div class="edit-number-circle">${nextNumber}</div>
+                    <input type="text" name="name" placeholder="アイテム名" class="styled-input" required>
+                </div>
                 <div class="edit-form-left">
-                    <div class="modal-edit-number-row">
-                        <div class="edit-number-circle">${nextNumber}</div>
-                        <input type="text" name="name" placeholder="アイテム名" class="styled-input" required>
-                    </div>
                     <div class="modal-edit-row"><label>期限：</label><input type="date" name="expiration_date" class="styled-input"></div>
                     <div class="modal-edit-row"><label>購入日：</label><input type="date" name="purchase_date" class="styled-input"></div>
                     ${ownerSelect}
@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <div class="edit-form-right">
                     <label for="new-item-image" class="image-preview-wrapper clickable-image">
+                        <img id="new-image-preview" style="max-width: 100%; max-height: 100%; display: none;">
                         <i class="fas fa-camera"></i>
                     </label>
                     <input type="file" id="new-item-image" name="image" accept="image/*" class="hidden-input">
@@ -59,6 +60,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 </button>
             </div>
         `;
+        
+        // 画像選択時のプレビュー処理（追加）
+        document.getElementById('new-item-image').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('new-image-preview');
+            const icon = document.querySelector('#new-item-image').previousElementSibling.querySelector('i');
+        
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    preview.src = event.target.result;
+                    preview.style.display = 'block';
+                    if (icon) icon.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    
     
         overlay.style.display = 'flex';
     
@@ -150,11 +169,14 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
         }
 
-        // 編集フォーム本体
+         // 編集フォーム本体
         body.innerHTML = `
             <div class="edit-form-content">
+                <div class="modal-edit-number-row">
+                    <div class="edit-number-circle">${number}</div>
+                    <input type="text" name="name" value="${item.name}" class="autosave-input styled-input name-input" data-item-id="${item.id}">
+                </div>
                 <div class="edit-form-left">
-                    <div class="modal-edit-number-row"><div class="edit-number-circle">${number}</div><input type="text" name="name" value="${item.name}" class="autosave-input styled-input name-input" data-item-id="${item.id}"></div>
                     <div class="modal-edit-row"><label>期限：</label><input type="date" name="expiration_date" value="${item.expiration_date}" class="autosave-input styled-input" data-item-id="${item.id}"></div>
                     <div class="modal-edit-row"><label>購入日：</label><input type="date" name="purchase_date" value="${item.purchase_date}" class="autosave-input styled-input" data-item-id="${item.id}"></div>
                     <div class="modal-edit-row"><label>個数：</label><input type="number" name="quantity" value="${item.quantity}" class="autosave-input styled-input" data-item-id="${item.id}"></div>
@@ -164,13 +186,39 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 <div class="edit-form-right">
                     <label for="edit-image-input-${item.id}" class="image-preview-wrapper clickable-image">
+                        <img id="image-preview-${item.id}" src="" style="max-width: 100%; max-height: 100%; display: none;">
                         <i class="fas fa-camera"></i>
                     </label>
-                    <input type="file" id="edit-image-input-${item.id}" name="image" accept="image/*"
-                        class="image-upload-input styled-input hidden-input" data-item-id="${item.id}">
+                    <input type="file" id="edit-image-input-${item.id}" name="image" accept="image/*" class="image-upload-input styled-input hidden-input" data-item-id="${item.id}">
                 </div>
+
             </div>
         `;
+
+        // 編集時：既存画像を表示
+        const preview = document.getElementById(`image-preview-${item.id}`);
+        const icon = preview?.parentElement.querySelector('i');
+
+        if (item.image_url) {
+            preview.src = item.image_url;
+            preview.style.display = 'block';
+            if (icon) icon.style.display = 'none';
+        }
+
+        // 画像選択時のプレビュー切り替え
+        document.getElementById(`edit-image-input-${item.id}`).addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    preview.src = event.target.result;
+                    preview.style.display = 'block';
+                    if (icon) icon.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
 
         // 編集フォームを開いたあとに実行
         const textarea = body.querySelector('textarea[name="description"]');
