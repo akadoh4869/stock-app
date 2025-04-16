@@ -24,7 +24,7 @@
         
                     <!-- ハンバーガー -->
                     <div class="hamburger-menu">
-                        <i class="fa-solid fa-bars"></i>
+                        <i class="fa-solid fa-magnifying-glass"></i>
                     </div>
                     
                 </div>
@@ -199,21 +199,19 @@
             </div>
         </div>
 
-        <!-- 🔍 検索オーバーレイ -->
+        <!-- 検索オーバーレイ -->
         <div id="search-overlay" class="search-overlay">
             <div class="search-header">
                 <input type="text" id="search-input"
-                    placeholder="{{ $currentType === 'group' ? 'キーワードまたは所有者名を検索' : 'キーワードを検索' }}">
-                <button onclick="closeSearchOverlay()">✕</button>
+                    placeholder="{{ $currentType === 'group' ? 'キーワードまたは所有者名を検索する' : 'キーワードを検索する' }}">
+                <button onclick="closeSearchOverlay()" class="close-search-button">✕</button>
             </div>
             <div id="search-results" class="search-results">
                 <!-- 検索結果がここに表示されます -->
             </div>
         </div>
-        
 
 
-        
     </main>
    
     <script>

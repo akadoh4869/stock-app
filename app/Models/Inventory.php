@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes; // ← 追加
 
 class Inventory extends Model
 {
-    use HasFactory;
+    use HasFactory , SoftDeletes; // ← 追加;
 
     protected $fillable = ['name', 'owner_id', 'group_id'];
 
@@ -30,4 +31,5 @@ class Inventory extends Model
     {
         return $this->belongsTo(Group::class);
     }
+
 }

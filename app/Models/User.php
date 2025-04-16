@@ -25,4 +25,10 @@ class User extends Authenticatable
         return $this->hasOne(Inventory::class, 'owner_id'); // ← user_id ではなく owner_id を指定
     }
 
+    public function inventories()
+    {
+        return $this->hasMany(\App\Models\Inventory::class, 'owner_id');
+    }
+    
+
 }

@@ -669,27 +669,27 @@ document.addEventListener('DOMContentLoaded', function () {
         results.forEach((item, index) => {
             const div = document.createElement('div');
             div.className = 'search-result-item';
-        
-            const ownerLine = window.currentType === 'group'
-                ? `<small>所有者: ${item.owner?.user_name ?? '共有'}</small><br>`
+    
+            const ownerName = window.currentType === 'group'
+                ? (item.owner?.user_name ?? '共有')
                 : '';
-        
+    
             div.innerHTML = `
-                <div style="border-bottom: 1px solid #ccc; padding: 10px; cursor: pointer;">
-                    <strong>${item.name}</strong><br>
-                    ${ownerLine}
+                <div class="search-result-line" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #ff66cc; cursor: pointer;">
+                    <span class="search-item-name">${item.name}</span>
+                    ${window.currentType === 'group' ? `<span class="search-owner-name">${ownerName}</span>` : ''}
                 </div>
             `;
-        
-            // ✅ クリックで詳細モーダルを開く
+    
             div.addEventListener('click', () => {
                 window.openDetailModal(item, index + 1);
             });
-        
+    
             searchResults.appendChild(div);
         });
-        
     }
+    
+    
     
 });
 

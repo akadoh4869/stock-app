@@ -20,16 +20,19 @@
                 <!-- 画像の上に重ねる -->
                 <div class="header-overlay">
                     <div class="header-container">
-                        <div class="user-name" id="user-name-toggle" style="cursor: pointer;">
-                            <!-- ユーザー名 -->
-                            @if ($currentType === 'group' && isset($currentGroup))
-                                {{ $currentGroup->name }}
-                            @elseif ($currentType === 'personal' && $inventory)
-                                {{ str_replace('の個人在庫', '', $inventory->name) }}
-                            @else
-                                {{ $user->user_name }}
-                            @endif
+                        <div class="user-name-group" id="user-name-toggle" style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                            <span class="user-name">
+                                @if ($currentType === 'group' && isset($currentGroup))
+                                    {{ $currentGroup->name }}
+                                @elseif ($currentType === 'personal' && $inventory)
+                                    {{ str_replace('の個人在庫', '', $inventory->name) }}
+                                @else
+                                    {{ $user->user_name }}
+                                @endif
+                            </span>
+                            <i class="fa-solid fa-user" style="color: #5cc0ff; font-size: 16px;"></i>
                         </div>
+                
                         <div class="app-name">ストログ</div>
                     </div>
                 </div>
@@ -144,7 +147,7 @@
         <div class="footer-overlay-fixed">
             @if($currentType === 'group' && isset($currentGroup))
                 <button onclick="window.location.href='{{ route('group.invite') }}'">
-                    <i class="fa-solid fa-user-plus"></i><br>メンバー招待
+                    <i class="fa-solid fa-user-plus"></i><br>招待
                 </button>
                 <form method="POST" action="{{ route('group.leave', ['groupId' => $currentGroup->id]) }}"
                     onsubmit="return confirm('本当にこのグループから退出しますか？');">
