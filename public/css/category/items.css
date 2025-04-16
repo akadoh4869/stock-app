@@ -731,6 +731,7 @@ textarea.styled-input {
     display: flex;
     flex-direction: column;
     padding: 20px;
+    border-left: 4px solid #ff66cc; /* ← ピンクの縦線 */
 }
 
 .search-overlay.open {
@@ -745,8 +746,22 @@ textarea.styled-input {
 
 .search-header input {
     flex: 1;
-    padding: 8px;
-    font-size: 16px;
+    padding: 8px 12px;
+    border: none;
+    border-bottom: 2px solid #5ce0f0;
+    font-size: 14px;
+    color: #666;
+    background: transparent;
+    outline: none;
+}
+
+.close-search-button {
+    background: none;
+    border: none;
+    color: black;
+    font-size: 20px;
+    margin-left: 10px;
+    cursor: pointer;
 }
 
 .search-results {
@@ -757,10 +772,35 @@ textarea.styled-input {
 
 .search-result-item {
     padding: 8px 12px;
-    border-bottom: 1px solid #ddd;
     cursor: pointer;
+    font-size: 12px;
+    color: #444;
 }
 
 .search-result-item:hover {
     background-color: #f0f0f0;
 }
+
+.search-result-item .remove-button {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #5ce0f0;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.search-item-name {
+    font-size: 13px;
+    color: black;
+    font-weight: bold;
+}
+
+.search-owner-name {
+    font-size: 12px;
+    color: black;
+}
+

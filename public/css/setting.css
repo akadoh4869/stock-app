@@ -1,0 +1,282 @@
+/* body {
+    font-family: 'Arial', sans-serif;
+    background-color: white;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; 
+}
+
+main {
+    max-width: 430px;
+    margin: 0 auto;
+    text-align: center;
+    height: auto;
+} */
+
+html, body {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* 上からの表示開始 */
+    background-color: white;
+    overflow-x: hidden;
+}
+
+main {
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    text-align: center;
+    height: auto;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05); /* オプション：境界を軽く見せる */
+}
+
+.line-top,
+.line-bottom {
+    width: 100%;
+    height: auto;
+}
+
+.line-top img,
+.line-bottom img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ===== header部分の調整 ===== */
+/* 上ライン全体 */
+.line-top {
+    position: relative;
+    width: 100%;
+}
+
+/* ライン画像 */
+.line-top img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ヘッダーのオーバーレイ部分（画像に重ねる） */
+.header-overlay {
+    position: absolute;
+    top: 60px; /* ライン画像の中での表示位置 */
+    left: 0;
+    width: 100%;
+    z-index: 10;
+}
+
+/* ヘッダー要素の整列 */
+.header-container {
+    display: flex;
+    justify-content: flex-end; /* ← 右寄せ */
+    align-items: flex-start;
+    padding: 0 20px;
+}
+
+.app-name {
+    font-size: 18px;
+    font-weight: 900;
+    color: #7dd3fc;
+    margin-top: -25px;
+    text-align: right;
+}
+
+
+/* 既存 .header は block要素として空でOK */
+.header {
+    height: 120px; /* 画像分の高さを確保（＝これがポイント！） */
+}
+
+/* ===== mainエリアの調整 ===== */
+.main {
+    padding: 0 20px;
+    /* margin-top: 10px; */
+}
+.setting-wrapper {
+    max-width: 430px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+.setting-title {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 40px;
+    color: #555;
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    padding: 18px 0;
+    font-size: 18px;
+    gap: 2%;
+    position: relative;
+}
+
+.setting-item i {
+    font-size: 26px;
+    flex-shrink: 0;
+    margin-left: 15%;
+}
+
+/* ✅ 点線は label のみ */
+.setting-label {
+    font-size: 20px;
+    color: #444;
+    border-bottom: 2px dotted #5ce0f0; /* デフォルトカラー */
+    padding-bottom: 4px;
+    width: 65%;
+}
+
+/* ✅ 偶数行だけピンクに */
+.setting-item:nth-child(even) .setting-label {
+    border-bottom-color: #ff66cc;
+}
+
+
+.line-bottom-fixed {
+    position: fixed;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    z-index: 0;
+}
+
+.line-bottom-fixed img {
+    width: 100%;
+    display: block;
+}
+
+.footer-overlay-fixed {
+    position: fixed;
+    bottom: 30px; /* 画像上に表示されるよう調整 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 20px;
+    background: transparent;
+    z-index: 10;
+}
+
+.footer-overlay-fixed button {
+    background: none;
+    border: none;
+    font-size: 14px;
+    color: #666;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.footer-overlay-fixed i {
+    font-size: 24px;
+    margin-bottom: 4px;
+    color: #38bdf8;
+}
+
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgb(255, 255, 255);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.overlay-content {
+    background: #fff;
+    max-width: 380px;
+    width: 90%;
+    border-radius: 15px;
+    padding: 20px;
+    position: relative;
+}
+
+.overlay-content h3 {
+    margin-top: 0;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.overlay-content button.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.confirm-buttons {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.confirm-buttons button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.confirm-buttons .cancel {
+    background-color: #ccc;
+}
+
+.confirm-buttons .confirm {
+    background-color: #ff66cc;
+    color: white;
+}
+
+.overlay.fullscreen-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: white;
+    z-index: 9999;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.modal-scroll-content {
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 10px 0;
+    line-height: 1.6;
+}
+
+.policy-menu {
+    list-style: none;
+    padding: 0;
+    text-align: center;
+}
+
+.policy-menu li {
+    margin: 12px 0;
+    cursor: pointer;
+    text-decoration: underline;
+    color: #555;
+}
+

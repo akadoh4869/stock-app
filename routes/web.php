@@ -100,7 +100,13 @@ Route::middleware(['auth'])->group(function () {
     // web.php
     Route::post('/items/bulk-store', [StockController::class, 'bulkStore'])->name('item.bulkStore');
 
+    Route::get('/account', function () {
+        return view('users.account');
+    })->name('account');
+
     Route::get('/settings', [SettingController::class, 'index'])->name('settings');
+    Route::get('/account', [SettingController::class, 'account'])->name('account');
+
 
     Route::post('/invitation/respond', [GroupController::class, 'respond'])->name('invitation.respond');
     Route::post('/invitation/viewed', [GroupController::class, 'markViewed'])->name('invitation.markViewed');
