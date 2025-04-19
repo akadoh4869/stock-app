@@ -111,4 +111,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/invitation/respond', [GroupController::class, 'respond'])->name('invitation.respond');
     Route::post('/invitation/viewed', [GroupController::class, 'markViewed'])->name('invitation.markViewed');
 
+    Route::post('/withdraw', [App\Http\Controllers\UserController::class, 'withdraw'])->name('withdraw');
+
+    // Route::get('/group/user-search', [App\Http\Controllers\GroupController::class, 'searchUsers'])->name('group.userSearch');
+
+    Route::get('/search-users', [GroupController::class, 'searchUsers'])->name('group.searchUsers');
+
 });

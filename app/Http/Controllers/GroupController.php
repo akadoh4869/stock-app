@@ -19,76 +19,90 @@ class GroupController extends Controller
     public function invite(Request $request)
     {
         $keyword = $request->input('keyword');
-
+    
         $results = [];
-
+    
         if ($keyword) {
             $results = User::where('user_name', 'like', "%{$keyword}%")
                 ->orWhere('name', 'like', "%{$keyword}%")
                 ->get();
         }
-
-        // 招待対象のグループ（セッションなどから取得する例）
-        $groupId = session('current_group_id');
+    
+        // ✅ requestの group_id を優先し、なければセッションから取得
+        $groupId = $request->input('group_id') ?? session('current_group_id');
+    
+        if (!$groupId) {
+            return redirect()->route('stock.index')->with('error', 'グループが見つかりません');
+        }
+    
         $group = Group::findOrFail($groupId);
-
+    
         return view('group.invitation', compact('results', 'group'));
     }
-
+    
     public function sendInvite(Request $request)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
             'group_id' => 'required|exists:groups,id',
+            'invites' => 'required|array',
+            'invites.*' => 'string' // user_nameで送られてくる
         ]);
-    
-        $userId = $request->input('user_id');
+
         $groupId = $request->input('group_id');
-        $inviterId = Auth::id();
-    
-        // すでにメンバーならスキップ
-        $alreadyMember = DB::table('group_members')
-            ->where('group_id', $groupId)
-            ->where('user_id', $userId)
-            ->exists();
-    
-        if ($alreadyMember) {
-            return redirect()->route('group.invite')->with('info', 'すでにメンバーです');
-        }
-    
-        // すでに招待されているかチェック（グループ×ユーザーで1件のみ取得）
-        $existingInvite = GroupInvitation::where('group_id', $groupId)
-            ->where('invitee_id', $userId)
-            ->first();
-    
-        if ($existingInvite) {
-            if ($existingInvite->status === 'pending' && is_null($existingInvite->responded_at)) {
-                // ✅ 保留中 → updated_atだけ更新
-                $existingInvite->touch();
+        $user = Auth::user();
+        $inviterId = $user->id;
+
+        $success = 0;
+        $skipped = 0;
+
+        foreach ($request->invites as $userName) {
+            $invitee = User::where('user_name', $userName)->first();
+
+            if (!$invitee || $invitee->id === $inviterId) {
+                continue;
+            }
+
+            // すでにグループのメンバーか？
+            $alreadyMember = DB::table('group_members')
+                ->where('group_id', $groupId)
+                ->where('user_id', $invitee->id)
+                ->exists();
+
+            if ($alreadyMember) {
+                $skipped++;
+                continue;
+            }
+
+            // 招待済みかチェック
+            $existingInvite = GroupInvitation::where('group_id', $groupId)
+                ->where('invitee_id', $invitee->id)
+                ->first();
+
+            if ($existingInvite) {
+                if ($existingInvite->status === 'pending' && is_null($existingInvite->responded_at)) {
+                    $existingInvite->touch();
+                } else {
+                    $existingInvite->update([
+                        'status' => 'pending',
+                        'inviter_id' => $inviterId,
+                        'responded_at' => null,
+                    ]);
+                }
             } else {
-                // ✅ 辞退済みまたは以前に保留して非表示状態 → 再招待（responded_atリセット）
-                $existingInvite->update([
-                    'status' => 'pending',
+                GroupInvitation::create([
+                    'group_id' => $groupId,
                     'inviter_id' => $inviterId,
-                    'responded_at' => null,
+                    'invitee_id' => $invitee->id,
+                    'status' => 'pending',
                 ]);
             }
-        } else {
-            // ✅ 新規招待
-            GroupInvitation::create([
-                'group_id' => $groupId,
-                'invitee_id' => $userId,
-                'inviter_id' => $inviterId,
-                'status' => 'pending',
-            ]);
-        }
-    
-        return redirect()->route('group.invite')->with('success', 'ユーザーを招待しました');
-    }
-    
 
-    
-    
+            $success++;
+        }
+
+        return redirect()->route('group.invite')->with('success', "{$success}人を招待しました（{$skipped}人はスキップ）");
+    }
+
     public function respond(Request $request)
     {
         $request->validate([
@@ -117,43 +131,27 @@ class GroupController extends Controller
     
         return redirect()->route('stock.index')->with('success', '対応しました');
     }
-    
-    
-    // public function markViewed(Request $request)
-    // {
-    //     $request->validate([
-    //         'invitation_ids' => 'required|array',
-    //         'invitation_ids.*' => 'exists:group_invitations,id',
-    //     ]);
-    
-    //     GroupInvitation::whereIn('id', $request->invitation_ids)
-    //         ->where('invitee_id', Auth::id())
-    //         ->update(['responded_at' => now()]);
-    
-    //     return redirect()->route('stock.index');
-    // }
+   
     public function markViewed(Request $request)
-{
-    $request->validate([
-        'invitation_ids' => 'required|array',
-        'invitation_ids.*' => 'exists:group_invitations,id',
-    ]);
+    {
+        $request->validate([
+            'invitation_ids' => 'required|array',
+            'invitation_ids.*' => 'exists:group_invitations,id',
+        ]);
 
-    $count = GroupInvitation::whereIn('id', $request->invitation_ids)
-        ->where('invitee_id', Auth::id())
-        ->update(['responded_at' => now()]);
+        $count = GroupInvitation::whereIn('id', $request->invitation_ids)
+            ->where('invitee_id', Auth::id())
+            ->update(['responded_at' => now()]);
 
-    \Log::info("【保留処理】{$count} 件の responded_at を更新", $request->invitation_ids);
+        \Log::info("【保留処理】{$count} 件の responded_at を更新", $request->invitation_ids);
 
-    // fetch対応 or redirect両方対応
-    if ($request->expectsJson()) {
-        return response()->json(['status' => 'ok', 'updated' => $count]);
+        // fetch対応 or redirect両方対応
+        if ($request->expectsJson()) {
+            return response()->json(['status' => 'ok', 'updated' => $count]);
+        }
+
+        return redirect()->route('stock.index');
     }
-
-    return redirect()->route('stock.index');
-}
-
-    
 
     public function leave($groupId)
     {
@@ -220,33 +218,33 @@ class GroupController extends Controller
             'type' => 'required|in:personal,group',
             'name' => 'required|string|max:255',
         ]);
-    
+
         $user = auth()->user();
-    
+
         // ✅ 合計スペース数チェック（個人 + グループ）
         $totalSpaces = Inventory::where('owner_id', $user->id)->count() + $user->groups()->count();
         if ($totalSpaces >= 5) {
             return redirect()->route('stock.index')->with('error', 'スペースは最大5つまでです。');
         }
-    
+
         if ($request->type === 'personal') {
             \Log::info('個人スペース作成開始');
-    
+
             $inventory = Inventory::create([
                 'owner_id' => $user->id,
                 'group_id' => null,
                 'name' => $request->name,
             ]);
-    
+
             // ✅ 作成した個人スペースをセッションに設定
             session([
                 'current_type' => 'personal',
                 'current_inventory_id' => $inventory->id,
                 'current_group_id' => null
             ]);
-    
+
             \Log::info('個人スペース作成完了');
-    
+
         } elseif ($request->type === 'group') {
             $group = Group::create([
                 'name' => $request->name,
@@ -254,15 +252,31 @@ class GroupController extends Controller
                 'invite_only' => true,
                 'max_members' => 30,
             ]);
-    
-            $group->users()->attach($user->id);
-    
+
+            $group->users()->attach($user->id); // 作成者をグループに参加させる
+
+            // ✅ グループ用インベントリ作成
             $inventory = Inventory::create([
                 'group_id' => $group->id,
                 'owner_id' => null,
                 'name' => $request->name . 'の在庫',
             ]);
-    
+
+            // ✅ 招待処理（ユーザー名ベース）
+            if ($request->has('invites')) {
+                foreach ($request->invites as $inviteName) {
+                    $invitee = User::where('user_name', $inviteName)->first();
+                    if ($invitee && $invitee->id !== $user->id) {
+                        GroupInvitation::create([
+                            'group_id' => $group->id,
+                            'inviter_id' => $user->id,
+                            'invitee_id' => $invitee->id,
+                            'status' => 'pending',
+                        ]);
+                    }
+                }
+            }
+
             // ✅ 作成したグループスペースをセッションに設定
             session([
                 'current_type' => 'group',
@@ -270,10 +284,10 @@ class GroupController extends Controller
                 'current_inventory_id' => null
             ]);
         }
-    
-        return redirect()->route('stock.index')->with('success', 'スペースを作成しました');
+
+        return redirect()->route('group.invite', ['from' => 'create']);
+
     }
-    
 
     public function destroy(Inventory $inventory)
     {
@@ -325,8 +339,20 @@ class GroupController extends Controller
         return redirect()->route('stock.index')->with('success', 'スペースを削除しました');
     }
     
-
-
-
-
+    public function searchUsers(Request $request)
+    {
+        $keyword = $request->query('keyword');
+    
+        if (!$keyword) {
+            return response()->json([]);
+        }
+    
+        $users = User::where('user_name', 'like', "%{$keyword}%")
+                    ->orWhere('name', 'like', "%{$keyword}%")
+                    ->limit(10)
+                    ->get(['id', 'user_name']);
+    
+        return response()->json($users);
+    }
+    
 }

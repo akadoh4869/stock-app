@@ -48,10 +48,11 @@
                     <div class="setting-label">お問い合せ</div>
                 </div>
         
-                <div class="setting-item" onclick="openOverlay('withdraw-overlay')">
+                <div class="setting-item" onclick="openOverlay('withdraw-modal')">
                     <i class="fa-solid fa-hand" style="color:#ff66cc;"></i>
                     <div class="setting-label">退会する</div>
                 </div>
+                
 
                 @if(Auth::user() && Auth::user()->is_admin)
                     <div class="setting-item" onclick="window.location.href='/admin'">
@@ -142,14 +143,19 @@
             
         
             <!-- オーバーレイ：退会確認 -->
-            <div id="withdraw-overlay" class="overlay">
+            <div id="withdraw-modal" class="overlay fullscreen-modal" style="display: none;">
                 <div class="overlay-content">
-                    <button class="close" onclick="closeOverlay('withdraw-overlay')">&times;</button>
-                    <h3>本当に退会しますか？</h3>
-                    <p>この操作は取り消せません。</p>
+                    <button class="close" onclick="closeOverlay('withdraw-modal')">&times;</button>
+                    <h3>退会確認</h3>
+                    <div class="modal-scroll-content">
+                        <p>本当に退会しますか？<br>すべてのデータが削除されます。</p>
+                    </div>
                     <div class="confirm-buttons">
-                        <button class="cancel" onclick="closeOverlay('withdraw-overlay')">キャンセル</button>
-                        <button class="confirm" onclick="alert('退会処理を実行')">退会する</button>
+                        <form method="POST" action="{{ route('withdraw') }}">
+                            @csrf
+                            <button type="submit" class="confirm">退会する</button>
+                            <button type="button" class="cancel" onclick="closeOverlay('withdraw-modal')">キャンセル</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -164,10 +170,13 @@
         <div class="footer-overlay-fixed">
             
             <button onclick="window.location.href='/top'">
-                <i class="fa-solid fa-house" style="color:#5ce0f0;"></i><br>ホーム
+                <i class="fa-solid fa-house"></i><br>ホーム
             </button>
             <button onclick="window.location.href='/history'">
                 <i class="fa-solid fa-clock"></i><br>履歴
+            </button>
+            <button onclick="window.location.href='/settings'">
+                <i class="fa-solid fa-gear"></i><br>設定
             </button>
         </div>
     </main>

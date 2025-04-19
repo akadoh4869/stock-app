@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Inventory;
 
 class RegisterController extends Controller
 {
@@ -64,17 +65,20 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        // dd($data['user_name']); // ここで user_name の内容を確認
-        // dd($data);
-
-        return User::create([
+        $user = User::create([
             'name' => $data['name'],
             'user_name' => $data['user_name'],
             'password' => Hash::make($data['password']),
-            // デフォルトのアバターを設定
-            // 'avatar' => '/images/TimeMafia1.jpg', // デフォルトのアバターのパス
-
         ]);
+
+        // ✅ アカウント作成と同時に個人スペースも作成
+        Inventory::create([
+            'owner_id' => $user->id,
+            'group_id' => null,
+            'name' => $data['user_name'] . 'の個人在庫',
+        ]);
+
+        return $user;
     }
 
     // app/Http/Controllers/Auth/RegisterController.php
