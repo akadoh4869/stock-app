@@ -1,0 +1,66 @@
+/* メンバー検索ラッパー */
+.invite-wrapper {
+    max-width: 80%;
+    margin: 20px auto;
+    text-align: left;
+}
+
+.invite-wrapper label {
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* 検索ボックス */
+.search-box {
+    display: flex;
+    align-items: center;
+    border: 2px solid #5ce0f0;
+    border-radius: 30px;
+    padding: 5px 12px;
+    background-color: white;
+}
+
+.search-box i {
+    color: #ff66cc;
+    font-size: 18px;
+    margin-right: 8px;
+}
+
+.search-box input {
+    border: none;
+    flex: 1;
+    font-size: 16px;
+    outline: none;
+}
+
+/* 候補リスト */
+.invite-results {
+    margin-top: 10px;
+    padding-left: 15px;
+}
+
+.invite-results label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 16px;
+    color: #555;
+}
+
+.invite-results input[type="checkbox"] {
+    accent-color: #ff66cc;
+}
+
+/* 招待ボタン */
+.invite-button {
+    margin: 30px auto;
+    display: block;
+    background-color: #ff66cc;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
