@@ -1,3 +1,130 @@
+html, body {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* 上からの表示開始 */
+    background-color: white;
+    overflow-x: hidden;
+}
+
+main {
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    text-align: center;
+    height: auto;
+    background-color: white;
+}
+
+.line-top,
+.line-bottom {
+    width: 100%;
+    height: auto;
+}
+
+.line-top img,
+.line-bottom img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ===== header部分の調整 ===== */
+/* 上ライン全体 */
+.line-top {
+    position: relative;
+    width: 100%;
+}
+
+/* ライン画像 */
+.line-top img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ヘッダーのオーバーレイ部分（画像に重ねる） */
+.header-overlay {
+    position: absolute;
+    top: 40px; /* ライン画像の中での表示位置 */
+    left: 0;
+    width: 100%;
+    z-index: 10;
+}
+
+/* ヘッダー要素の整列 */
+.header-container {
+    display: flex;
+    justify-content: flex-start; /* ← 左寄せ */
+    align-items: flex-start;
+    padding: 0 20px;
+}
+
+/* 既存 .header は block要素として空でOK */
+.header {
+    height: 120px; /* 画像分の高さを確保（＝これがポイント！） */
+}
+
+/* ===== mainエリアの調整 ===== */
+.main {
+    padding: 0 20px;
+    /* margin-top: 10px; */
+}
+
+.invite-instruction-wrapper {
+    text-align: center;
+    padding: 30px 20px;
+}
+
+.instruction-text {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+.invite-button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+}
+
+/* 招待するボタン */
+.invite-large-button {
+    background-color: #ff66cc;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 14px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    width: 80%;
+    max-width: 300px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.invite-large-button:hover {
+    background-color: #ff4bb1;
+}
+
+/* スキップボタン */
+.skip-large-button {
+    background-color: white;
+    color: #ff66cc;
+    border: 2px solid #ff66cc;
+    border-radius: 30px;
+    padding: 14px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    width: 80%;
+    max-width: 300px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.skip-large-button:hover {
+    background-color: #ffe6f3;
+}
+
 /* メンバー検索ラッパー */
 .invite-wrapper {
     max-width: 80%;
@@ -51,6 +178,53 @@
     accent-color: #ff66cc;
 }
 
+#selected-users-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.selected-user-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffe6f3;
+    border-radius: 30px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    width: 90%;
+    max-width: 400px;
+    /* color: #ff66cc; */
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.selected-user-left {
+    display: flex;
+    align-items: center;
+}
+
+.selected-user-dot {
+    width: 12px;
+    height: 12px;
+    background-color: #ff66cc;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.selected-user-name {
+    color: #ff66cc;
+}
+
+.remove-user-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #ff66cc;
+    cursor: pointer;
+}
+
+
+
 /* 招待ボタン */
 .invite-button {
     margin: 30px auto;
@@ -64,3 +238,52 @@
     font-weight: bold;
     cursor: pointer;
 }
+
+.line-bottom-fixed {
+    position: fixed;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    z-index: 0;
+}
+
+.line-bottom-fixed img {
+    width: 100%;
+    display: block;
+}
+
+.footer-overlay-fixed {
+    position: fixed;
+    bottom: 30px; /* 画像上に表示されるよう調整 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 20px;
+    background: transparent;
+    z-index: 10;
+}
+
+.footer-overlay-fixed button {
+    background: none;
+    border: none;
+    font-size: 14px;
+    color: #666;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.footer-overlay-fixed i {
+    font-size: 24px;
+    margin-bottom: 4px;
+    color: #38bdf8;
+}
+
