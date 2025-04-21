@@ -1,92 +1,308 @@
-body {
-    font-family: sans-serif;
-    background-color: #f7f8fc;
-    padding: 20px;
+html, body {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background-color: white;
+    overflow-x: hidden;
 }
 
-.container {
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px;
-    max-width: 600px;
-    margin: auto;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+main {
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    text-align: center;
+    height: auto;
+    background-color: white;
 }
 
-.group-name {
-    font-size: 18px;
-    margin-bottom: 10px;
+.header {
+    height: 80px;
+    
+}
+
+
+.line-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-width: 430px;
+    text-align: center;
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+/* ライン画像 */
+.line-top img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+
+.header-overlay {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+}
+
+.header-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 0 20px;
+}
+
+.header-container > a{
+    text-decoration: none;
+    color: black;
 }
 
 .group-input {
-    width: 100%;
+    margin-top: 5%;
+    width: 70%;
+    /* margin-left: 15%;
+    margin-right: 15%; */
     padding: 10px;
     font-size: 18px;
     border-radius: 20px;
     border: 2px solid pink;
     text-align: center;
-    margin-bottom: 20px;
 }
 
+.main {
+    /* padding: 0 20px; */
+    height: 200vh;
+    margin-top: 20%;
+    width: 100%;
+}
+
+.container {
+    background: #fff;
+    width: 100%;
+    /* margin-left: 10%;
+    margin-right: 10%; */
+}
+
+
+
 .item-box {
-    border: 2px solid #add8e6;
-    border-radius: 16px;
-    padding: 10px 15px;
+    width: 100%;
+    text-align: center;
+    margin-top: 5%;
     margin-bottom: 16px;
     position: relative;
+    font-size: 14px;
+}
+
+.item-header{
+    display: flex;
+    width: 100%;
 }
 
 .item-number {
-    position: absolute;
-    top: -10px;
-    left: -10px;
-    background: pink;
+    display: inline-block;
+    background: #ff66cc;
     color: white;
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     text-align: center;
-    line-height: 28px;
+    line-height: 30px;
     font-weight: bold;
+    margin-right: 8px;
+    margin-top: 5px;
+    width: 10%;
 }
 
-.item-box input[type="text"],
-.item-box input[type="date"],
-.item-box input[type="number"] {
+.item-header input[type="text"]{
     width: 100%;
-    margin: 4px 0;
-    padding: 6px;
+    /* margin: 4px 0; */
+    padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 6px;
+    border-radius: 20px;
+    font-size: 14px;
+    border: 2px solid #5ce0f0;
+
 }
 
-.item-row {
-    margin-top: 8px;
+.item-row{
+    width: 100%;
+    margin-top: 3%;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
 }
 
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    border-radius: 24px;
-    background-color: pink;
-    color: white;
-    font-weight: bold;
-    text-align: center;
+.item-row-row{
+    width: 100%;
+    display: flex;
+    text-align: left;
+    margin-top: 3%;
+}
+
+.item-box input[type="date"]{
+    width: 65%;
+    margin-left: 3%;
     border: none;
-    margin-top: 10px;
+    border-bottom: 2px dotted #5ce0f0;
+
+}
+
+.row-expiration,
+.row-date{
+    display: flex;
+    width: 50%;
+    margin-top: 3%;
+}
+
+.row-owner{
+    width: 50%;
+    text-align: left;
+}
+
+select{
+    width: 65%;
+    margin-left: 3%;
+    border: none;
+    border-bottom: 2px dotted #5ce0f0;
+}
+
+.row-quantity{
+    width: 50%;
+    display: flex;
+    text-align: left;
+}
+
+.item-box input[type="number"]{
+    width: 65%;
+    margin-left: 3%;
+    border: none;
+    border-bottom: 2px dotted #5ce0f0;
+}
+
+.item-row input[type="text"]{
+    width: 95%;
+    /* margin-left: 5%; */
+    margin-right: 5%;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 14px; 
+    /* border: none;
+    border-bottom: 2px dotted #5ce0f0; */
+    border: 1px dotted #5ce0f0;
+}
+
+.buttons {
+    display: flex;
+    /* justify-content: space-between; */
+    align-items: center;
+    margin: 30px auto 0;
+    padding: 0 10px;
+    max-width: 90%;
+}
+
+/* 共通ボタン */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 30px;
+    cursor: pointer;
+    border: none;
+    white-space: nowrap;
+    width: 100%;
+}
+
+/* 追加ボタン（左） */
+/* 左の「記入欄追加」 */
+.add-button {
+    background-color: transparent;
+    color: #555;
+    font-size: 14px;
+    padding: 6px 10px;
+    gap: 6px;
+    width: auto;
+    display: flex;
+    align-items: center;
+    width: 40%;
+    margin-left: 5%;
+}
+
+/* 丸いアイコン */
+.add-button i {
+    color: #ff66cc;
+    border-radius: 50%;
+    padding: 3px;
+    font-size: 30px;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    display: inline-block;
+}
+
+/* 完了ボタン（右） */
+.submit-button {
+    background-color: #ff66cc;
+    color: white;
+    font-size: 16px;
+    padding: 12px 24px;
+    font-weight: bold;
+    width: 60%;
+    margin-left: 10%;
+}
+
+
+.line-bottom-fixed {
+    position: fixed;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    z-index: 0;
+}
+
+.line-bottom-fixed img {
+    width: 100%;
+    display: block;
+}
+
+.footer-overlay-fixed {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 20px;
+    background: transparent;
+    z-index: 10;
+}
+
+.footer-overlay-fixed button {
+    background: none;
+    border: none;
+    font-size: 14px;
+    color: #666;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: bold;
     cursor: pointer;
 }
 
-.add-button {
-    background-color: #f99cc9;
-}
-
-.bottom-menu {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 30px;
-}
-
-.bottom-menu div {
-    text-align: center;
+.footer-overlay-fixed i {
+    font-size: 24px;
+    margin-bottom: 4px;
+    color: #38bdf8;
 }
