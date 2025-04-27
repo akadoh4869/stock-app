@@ -7,7 +7,9 @@
     <title>管理者ページ</title>
 </head>
 <body>
-    
+    <div class="user-count">
+        <h1>ユーザー登録者数: {{ $userCount }}</h1>
+    </div>
     
 </body>
 </html>
