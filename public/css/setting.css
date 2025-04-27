@@ -406,3 +406,223 @@ main {
     background: #5ce0f0;
     color: white;
 }
+
+#policy-overlay {
+    position: fixed;
+    inset: 0; /* ← top, right, bottom, left を全部0に！ */
+    background: white;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* ← 上から並べるように！ */
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+#policy-overlay .line-top {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    z-index: 10;
+}
+
+#policy-overlay .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* width: 100%; */
+}
+
+#policy-overlay .back-link {
+    color: #666;
+    font-size: 16px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#policy-overlay .main {
+    width: 100%;
+    max-width: 430px;
+    height: auto; /* ← これ追加！高さ100%固定 */
+    margin: 0 auto;
+    padding-top: 40px;
+    padding-bottom: 120px;
+    box-sizing: border-box;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+#policy-overlay .content {
+    flex-grow: 1; /* ← 中身エリアを縦に伸ばす！ */
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* タイトル（ストログ規約） */
+#policy-overlay .history-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #666;
+    margin-bottom: 30px;
+    margin-top: 0;
+}
+
+/* メニューリスト */
+.policy-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto; /* ←中央寄せ */
+    width: 100%;
+    max-width: 380px; /* ←リスト幅を制限（中央にまとまる） */
+}
+
+.policy-menu ul {
+    list-style: none;
+}
+
+/* メニュー項目 */
+.policy-menu li {
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    color: #333;
+    border-bottom: 2px dotted #5ce0f0;
+    padding: 10px 0;
+    text-decoration: none;
+    text-align: left;
+    margin-top: 0;
+}
+
+/* バージョンだけ左右に分ける */
+.version-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 右側のバージョン番号のスタイル */
+.version-number {
+    font-size: 14px;
+    color: #555;
+    font-weight: bold;
+}
+
+.fullscreen-modal {
+    display: flex;               /* ←ここを追加して */
+    flex-direction: column;
+    justify-content: flex-start; /* 上からスタートでもいい */
+    align-items: center;         /* ←ここ追加で中央に寄る！ */
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.95);
+    z-index: 3000;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.fullscreen-modal .overlay-content {
+    width: 90%;
+    max-width: 430px;
+    margin-left: -10%;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+
+.close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.modal-scroll-content {
+    margin-top: 20px;
+}
+
+#withdraw-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5); /* 薄暗い背景に */
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+#withdraw-modal .overlay-content {
+    background: white;
+    padding: 30px 20px;
+    border: 2px solid #5ce0f0 ;
+    border-radius: 20px;
+    text-align: center;
+    width: 80%;
+    /* margin-left: 5%; */
+    max-width: 380px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    position: relative;
+}
+
+/* 閉じるボタン（✕） */
+#withdraw-modal .close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* 見出し（h3） */
+#withdraw-modal h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* メッセージ */
+#withdraw-modal .modal-scroll-content p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+/* ボタン2つ横並び */
+#withdraw-modal .confirm-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* ボタンデザイン */
+#withdraw-modal .confirm, 
+#withdraw-modal .cancel {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 20px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+
+}
+
+#withdraw-modal .confirm {
+    background: #ff66cc;
+    color: white;
+}
+
+#withdraw-modal .cancel {
+    background: #5ce0f0;
+    color: white;
+}

@@ -5,6 +5,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -116,5 +117,8 @@ Route::middleware(['auth'])->group(function () {
     // Route::get('/group/user-search', [App\Http\Controllers\GroupController::class, 'searchUsers'])->name('group.userSearch');
 
     Route::get('/search-users', [GroupController::class, 'searchUsers'])->name('group.searchUsers');
+
+    // Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+    Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
 
 });
