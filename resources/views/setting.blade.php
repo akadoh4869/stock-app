@@ -65,32 +65,67 @@
             </div>
         
             <!-- オーバーレイ：招待一覧 -->
-            <div id="invitation-overlay" class="overlay">
-                <div class="overlay-content">
-                    <button class="close" onclick="closeOverlay('invitation-overlay')">&times;</button>
-                    <h2>保留中のグループ招待</h2>
-                        @if($pendingInvitations->isEmpty())
-                            <p>保留中のグループ招待はありません。</p>
-                        @else
-                            <ul>
-                                @foreach($pendingInvitations as $invitation)
-                                    <li style="margin-bottom: 10px;">
-                                        「{{ $invitation->group->name }}」への招待
-                                        <form action="{{ route('invitation.respond') }}" method="POST" style="display:inline;">
-                                            @csrf
-                                            <input type="hidden" name="invitation_id" value="{{ $invitation->id }}">
-                                            @if($totalSpaceCount < 3)
-                                                <button name="response" value="accept">参加</button>
-                                            @endif
-                                            <button name="response" value="decline">辞退</button>
-                                        </form>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @endif
+            <!-- オーバーレイ（フルスクリーンページ風） -->
+            <div id="invitation-overlay" class="overlay" style="display: none;">
+                
+                <!-- 上ライン -->
+                <div class="line-top">
+                    <img src="{{ asset('/storage/images/top-line.jpg') }}" alt="上ライン">
+                    <div class="header-overlay">
+                        <div class="header-container">
+                            <a href="#" class="back-link" onclick="closeOverlay('invitation-overlay')">← 戻る</a>
+                            <div class="app-name">ストログ</div>
+                        </div>
+                    </div>
                 </div>
+
+
+                <!-- メインエリア -->
+                <div class="main">
+                    <div class="content">
+                        
+                        <div class="history-title">保留中招待一覧</div>
+
+                        <div class="invitation-icon">
+                            <i class="fa-solid fa-envelope"></i>
+                        </div>
+
+                       
+
+                        @if($pendingInvitations->isEmpty())
+                            <p style="text-align: center; margin-top: 50px;">保留中のグループ招待はありません。</p>
+                        @else
+                            <div class="invitation-list">
+                                @foreach($pendingInvitations as $invitation)
+                                    <div class="invitation-card">
+                                        <div class="invitation-text">
+                                            {{ $invitation->group->name }}
+                                        </div>
+                                        <div class="invitation-buttons">
+                                            <form action="{{ route('invitation.respond') }}" method="POST" style="display: flex; gap: 10px;">
+                                                @csrf
+                                                <input type="hidden" name="invitation_id" value="{{ $invitation->id }}">
+                                                @if($totalSpaceCount < 3)
+                                                    <button class="accept-btn" name="response" value="accept">参加</button>
+                                                @endif
+                                                <button class="decline-btn" name="response" value="decline">辞退</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- 下ライン -->
+                <div class="line-bottom-fixed">
+                    <img src="{{ asset('/storage/images/bottom-line.jpg') }}" alt="下ライン">
+                </div>
+
+                
             </div>
-        
+
             <!-- ストログ規約のメニュー一覧オーバーレイ -->
             <div id="policy-overlay" class="overlay">
                 <div class="overlay-content">

@@ -219,16 +219,28 @@ class StockController extends Controller
 
     public function history()
     {
-        $deletedItems = InventoryItem::onlyTrashed()->orderBy('deleted_at', 'desc')->get();
+        // ソフトデリートされたアイテムを取得 ＋ image_urlを追加して渡す
+        $deletedItems = InventoryItem::onlyTrashed()
+        ->where('inventory_id', $inventory->id)
+        ->with('images')
+        ->orderBy('deleted_at', 'desc')
+        ->get()
+        ->map(function ($item) {
+            $firstImage = $item->images->first();
+            $item->image_url = $firstImage ? asset('storage/' . $firstImage->image_path) : null;
+            return $item;
+        });
+
         return view('items.history', compact('deletedItems'));
     }
-    
+
     public function restore($id)
     {
         $item = InventoryItem::onlyTrashed()->findOrFail($id);
         $item->restore();
     
-        return back()->with('success', 'アイテムを復元しました');
+        return back();
+        // ->with('success', 'アイテムを復元しました');
     }
     
     public function forceDelete($id)
