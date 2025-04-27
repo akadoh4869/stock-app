@@ -29,16 +29,16 @@
                     <i class="fa-solid fa-user" style="color:#ff66cc;"></i>
                     <div class="setting-label">アカウント設定</div>
                 </div>
-                <div class="setting-item" onclick="openOverlay('delete-overlay')">
+                {{-- <div class="setting-item" onclick="openOverlay('delete-overlay')">
                     <i class="fa-solid fa-trash" style="color:#5ce0f0;"></i>
                     <div class="setting-label">削除一覧</div>
-                </div>
+                </div> --}}
                 <div class="setting-item" onclick="openOverlay('option-overlay')">
-                    <i class="fa-solid fa-star" style="color:#ff66cc;"></i>
+                    <i class="fa-solid fa-star" style="color:#5ce0f0;"></i>
                     <div class="setting-label">有料オプション</div>
                 </div>
                 <div class="setting-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="fa-solid fa-sign-out-alt" style="color:#5ce0f0;"></i>
+                    <i class="fa-solid fa-sign-out-alt" style="color:#ff66cc;"></i>
                     <div class="setting-label">ログアウト</div>
                 </div>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

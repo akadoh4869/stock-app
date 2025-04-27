@@ -263,3 +263,146 @@ main {
     color: #555;
 }
 
+#invitation-overlay .line-top {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    z-index: 10;
+}
+
+#invitation-overlay {
+    position: fixed;
+    inset: 0; /* ← top, right, bottom, left を全部0に！ */
+    background: white;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* ← 上から並べるように！ */
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+#invitation-overlay .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* width: 100%; */
+}
+
+#invitation-overlay .back-link {
+    color: #666;
+    font-size: 16px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#invitation-overlay .main {
+    width: 100%;
+    max-width: 430px;
+    height: auto; /* ← これ追加！高さ100%固定 */
+    margin: 0 auto;
+    padding-top: 80px;
+    padding-bottom: 120px;
+    box-sizing: border-box;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+#invitation-overlay .content {
+    flex-grow: 1; /* ← 中身エリアを縦に伸ばす！ */
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* メール背景まとめ */
+.invitation-background-wrapper {
+    position: relative;
+    width: 90%;
+    margin: 0 auto;
+    margin-top: 30px;
+}
+
+/* メールアイコン */
+.invitation-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 380px;
+    color: rgba(92, 224, 240, 0.1);
+    pointer-events: none;
+    z-index: 15;
+}
+
+.history-title{
+    margin-top: 15%;
+    margin-bottom: 15%;
+    font-size: 22px;
+    font-weight: bold;
+    color: #666;
+    z-index: 15;
+    
+
+}
+
+/* リスト本体 */
+.invitation-list {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 90%;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+/* 招待カード */
+.invitation-card {
+    width: 100%;
+    background: white;
+    padding: 10px;
+    /* border-radius: 12px; */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px dotted #5ce0f0;
+}
+
+.invitation-text {
+    font-weight: bold;
+    font-size: 16px;
+    color: #666;
+    text-align: left;
+}
+
+.invitation-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.accept-btn, .decline-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: bold;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.accept-btn {
+    background: #ff66cc;
+    color: white;
+}
+
+.decline-btn {
+    background: #5ce0f0;
+    color: white;
+}

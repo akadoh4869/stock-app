@@ -219,7 +219,8 @@ class CategoryController extends Controller
             ->where('category_id', $category->id)
             ->restore();
 
-        return redirect()->route('category.history')->with('success', 'カテゴリとアイテムを復元しました');
+        return redirect()->route('category.history');
+        // ->with('success', 'カテゴリとアイテムを復元しました');
     }
 
     public function forceDelete($id)
@@ -234,7 +235,8 @@ class CategoryController extends Controller
         // カテゴリを物理削除
         $category->forceDelete();
 
-        return redirect()->route('category.history')->with('success', 'カテゴリとアイテムを完全に削除しました');
+        return redirect()->route('category.history');
+        // ->with('success', 'カテゴリとアイテムを完全に削除しました');
     }
 
     public function historyByCategory($categoryId)

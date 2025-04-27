@@ -1,23 +1,458 @@
-body {
-    margin: 0;
-    padding: 0;
-    position: relative;
-  }
+/* html, body はリセット気味に */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: white;
+  overflow-x: hidden;
+}
+
+/* main でスマホ幅に制限し中央配置 */
+main {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  text-align: center;
+  background-color: white;
+  position: relative;
+}
+
+/* 既存 .header は block要素として空でOK */
+.header {
+  height:100px; /* 画像分の高さを確保（＝これがポイント！） */
+}
+
+.line-top {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  max-width: 430px;
+  text-align: center;
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+/* ライン画像 */
+.line-top img {
+  width: 100%;
+  height: 150px;
+  display: block;
+}
+
+
+.header-overlay {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+.header-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 0 20px;
+}
+
+.header-container > a{
+  text-decoration: none;
+  color: black;
+}
+
+.history-title{
+  text-align: center;
+  font-size: 24px;
+  /* margin-bottom: 40px; */
+  margin-top: 10%;
+  color: #555;
+  z-index: 15;
+}
+
+/* ===== mainエリアの調整 ===== */
+.main {
+  width: 100%;
+  margin: 0%;
+  margin-bottom: 100px;
+  /* padding: 0 20px; */
+  /* margin-top: 10px; */
+}
+
+.content{
+  /* max-width: 430px; */
+  /* margin: 0 auto; */
+  padding-top: 5px;
+  /* padding-bottom: 5px; */
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-top: 20%;
+  width: 85%;
+  margin-left: 5%;
+  margin-right: 5%;
+  height: auto;
+}
+
+/* .category-wrapper {
+  margin-bottom: 20px;
+} */
+
+.category-wrapper {
+  position: relative;
+  overflow: hidden;
+  margin-top: 3%;
+  width: 90%;
+  background: white;
+  /* display: flex;
+  align-items: center; */
+}
+
+/* スライドする部分（見た目は今までと同じ） */
+.swipe-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  /* padding: 15px 20px; */
+  background-color: white;
+  transition: transform 0.3s ease;
+  /* border-bottom: 2px dotted #7dd3fc; */
+  box-sizing: border-box;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 5px 10px;
+  background-color: white;
+  color: #555;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+/* ピンク丸 */
+.circle {
+  width: 20px;
+  height: 20px;
+  border: 3px solid hotpink;
+  border-radius: 50%;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  transition: all 0.3s ease;
+}
+
+/* レ点 */
+.circle::after {
+  content: '✓';
+  font-size: 16px;
+  color: hotpink;
+  display: none;
+}
+
+/* active時に丸だけ変わる */
+.category-item.active .circle {
+  background-color: hotpink;
+}
+.category-item.active .circle::after {
+  display: block;
+  color: white;
+}
+
+/* ◀ ここ！カテゴリ名と個数を両端に並べる！ */
+.category-texts {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1; /* 丸以外のスペースを全部使う */
+  font-size: 18px;
+  border-bottom:  2px dotted #7dd3fc;
+  padding: 5px;
+}
+
+/* 名前と数をそれぞれ左・右に */
+.category-name {
+  text-align: left;
+}
+
+.category-count {
+  text-align: right;
+}
+
+/* item-listは何も変更なし */
+.item-list {
+  display: none;
+  margin-top: 10px;
+  padding-left: 40px;
+  text-align: left;
   
-  .line {
-    height: 6px;
-    width: 100%;
-    position: fixed;
-    z-index: 999;
-  }
-  
-  .top-line {
-    top: 0;
-    background: linear-gradient(to bottom, cyan 0%, cyan 50%, hotpink 50%, hotpink 100%);
-  }
-  
-  .bottom-line {
-    bottom: 0;
-    background: linear-gradient(to bottom, cyan 0%, cyan 50%, hotpink 50%, hotpink 100%);
-  }
-  
+}
+
+/* activeでリスト表示だけ */
+.category-item.active + .item-list {
+  display: block;
+}
+
+/* アクションボタンを右に隠しておく */
+.action-buttons {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  background: white;
+  transform: translateX(100%); /* 最初は右外に隠す */
+  transition: transform 0.3s ease;
+}
+
+/* ボタン個別スタイル */
+.action-buttons form {
+  margin: 0;
+}
+
+.restore-btn, .delete-btn {
+  width: 50px;
+  height:100%;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  color: white;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 20px 20px;
+}
+
+.restore-btn {
+  background-color: #7dd3fc;
+}
+
+.delete-btn {
+  background-color: red;
+}
+
+/* スワイプしたら中身だけ左にずらす！ */
+.category-wrapper.swiped {
+  transform: translateX(-20px); /* ボタン2個分の幅 */
+}
+
+/* スワイプしたらボタンだけ左にずらす！ */
+.category-wrapper.swiped .action-buttons {
+  transform: translateX(0px); /* ボタン2個分の幅 */
+}
+
+
+
+.line-bottom-fixed {
+  position: fixed;
+  bottom: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  z-index: 0;
+}
+
+.line-bottom-fixed img {
+  width: 100%;
+  display: block;
+}
+
+.footer-overlay-fixed {
+  position: fixed;
+  bottom: 30px; /* 画像上に表示されるよう調整 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 20px;
+  background: transparent;
+  z-index: 10;
+}
+
+.footer-overlay-fixed button {
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #666;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.footer-overlay-fixed i {
+  font-size: 24px;
+  margin-bottom: 4px;
+  color: #38bdf8;
+}
+
+
+/* モーダルオーバーレイ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* モーダル本体 */
+.modal-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-left: 2.5%;
+  margin-right: 2.5%;
+  width: 95%;
+  max-width: 400px;
+  border: 2px solid #5ce0f0;
+  position: relative;
+}
+
+/* 閉じるボタン */
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* ヘッダー部分（番号と名前） */
+.modal-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  height: 30px;
+}
+
+.modal-number {
+  background: hotpink;
+  color: white;
+  width: 30px;
+  height: 30px;
+  font-weight: bold;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  margin-right: 10px;
+  z-index: 1;
+}
+
+.modal-name {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  white-space: nowrap;
+}
+
+/* 中身エリア（テキスト＋画像） */
+.modal-info {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.modal-text {
+  width: 65%;
+}
+
+/* 各ラベルと値 */
+.modal-text > div,
+.memo-block {
+  display: flex;
+  margin-bottom: 10px;
+  width: 100%;
+  text-align: left;
+}
+
+.modal-text strong,
+.memo-block strong {
+  color: #666;
+  font-weight: bold;
+  vertical-align: top;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.modal-text span {
+  display: inline-block;
+  font-size: 14px;
+  color: #333;
+  border-bottom: 2px dotted #5ce0f0;
+  padding-bottom: 2px;
+  line-height: 1.6;
+  max-width: 200px;
+  word-break: break-word;
+  white-space: normal;
+}
+
+/* メモ欄専用 */
+.memo-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 200px;
+}
+
+.memo-line {
+  border-bottom: 2px dotted #5ce0f0;
+  padding-bottom: 2px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  word-break: break-word;
+}
+
+/* 右側の画像エリア */
+.modal-image-wrapper {
+  width: 35%;
+  height: 200px;
+  border: 2px solid #5ce0f0;
+  border-radius: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.modal-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.modal-image-placeholder {
+  width: 100%;
+  height: 100%;
+  font-size: 36px;
+  color: #ff66cc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
