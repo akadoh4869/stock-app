@@ -67,14 +67,6 @@
                 <button type="submit">ログイン</button>
             </form>
         </div>
-
-        
-        <!-- JavaScriptを追加 -->
-        <script>
-            function redirectToWelcome() {
-                window.location.href = "{{ url('/') }}";
-            }
-        </script>
    
     </body>
     

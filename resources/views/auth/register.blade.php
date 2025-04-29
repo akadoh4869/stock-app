@@ -37,7 +37,7 @@
         <div class="circle circle-bottom6 pulse"></div>
         <div class="circle circle-bottom7 float-x"></div>
 
-      </div>
+    </div>
       
     
 

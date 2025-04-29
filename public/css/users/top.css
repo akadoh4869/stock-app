@@ -76,6 +76,7 @@ main {
     font-weight: 900;
     color: #7dd3fc;
     margin-top: -25px; /* ← ここで少し上にずらす */
+    font-family: 'Mochiy Pop One', sans-serif;
 }
 
 /* 既存 .header は block要素として空でOK */
