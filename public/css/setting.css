@@ -66,6 +66,7 @@ main {
     color: #7dd3fc;
     margin-top: -25px;
     text-align: right;
+    font-family: 'Mochiy Pop One', sans-serif;
 }
 
 
@@ -83,6 +84,7 @@ main {
     max-width: 430px;
     margin: 0 auto;
     padding: 30px 20px;
+    height: 100%;
 }
 
 .setting-title {
@@ -90,6 +92,7 @@ main {
     font-size: 28px;
     margin-bottom: 40px;
     color: #555;
+    margin-top: -10%;
 }
 
 .setting-item {
@@ -563,7 +566,7 @@ main {
 #withdraw-modal .overlay-content {
     background: white;
     padding: 30px 20px;
-    border: 2px solid #5ce0f0 ;
+    border: 2px solid #5ce0f0;
     border-radius: 20px;
     text-align: center;
     width: 80%;
