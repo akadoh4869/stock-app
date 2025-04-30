@@ -91,7 +91,7 @@ Route::middleware(['auth'])->group(function () {
     
     // Route::post('/items/{item}/image-upload', [StockController::class, 'uploadImage'])->name('item.image.upload');
 
-    Route::post('/items/{item}/image-upload', [StockController::class, 'uploadImage'])->name('item.image.upload');
+    // Route::post('/items/{item}/image-upload', [StockController::class, 'uploadImage'])->name('item.image.upload');
 
     // web.php
     Route::post('/category/update/{id}', [CategoryController::class, 'updateName']);
