@@ -8,8 +8,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'すとログ') }}</title>
-    {{-- <link rel="manifest" href="/manifest.json"> --}}
-    {{-- <meta name="theme-color" content="#111111"> --}}
+    @include('partials.head')
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">

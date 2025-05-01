@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>削除履歴</title>
     <link rel="stylesheet" href="{{ asset('css/category/history.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    @include('partials.head')
     {{-- <script src="{{ asset('js/category/history.js') }}"></script> --}}
 </head>
 <body>
