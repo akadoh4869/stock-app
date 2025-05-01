@@ -1,0 +1,9 @@
+
+.user-list ul {
+    list-style: none;
+    padding: 0;
+}
+.user-list li {
+    padding: 4px 0;
+    border-bottom: 1px dotted #ccc;
+}
