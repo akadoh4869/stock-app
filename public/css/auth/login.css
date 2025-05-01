@@ -1,14 +1,39 @@
+/* 背景画像（上下） */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  height: 150px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+body::before {
+  top: 0;
+  background-image: url('/storage/images/auth-top.jpg');
+}
+
+body::after {
+  bottom: 0;
+  background-image: url('/storage/images/auth-bottom.jpg');
+}
+
 /* 全体背景設定 */
 body {
-    display: flex;
-    justify-content: center;
-    background-color: white;
-    background-image: url('/storage/images/auth.png'); /* ✅ storage経由のパス */
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: top center;
-    min-height: 100vh;
-    margin: 0;
+  display: flex;
+  justify-content: center;
+  background-color: white;
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Rounded Mplus 1c', 'M PLUS Rounded 1c', sans-serif;
+  position: relative;
+  z-index: 1;
 }
 
 /* 中央固定幅コンテナ */
