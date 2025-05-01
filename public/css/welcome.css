@@ -1,51 +1,62 @@
 body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Yomogi', cursive;
+    background-color: white;
     display: flex;
     justify-content: center;
-    background-color: white;
-    background-image: url('/storage/images/auth.png'); /* ✅ storage経由のパス */
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: top center;
     min-height: 100vh;
-    margin: 0;
+    overflow-x: hidden;
+    position: relative;
+  }
+  
+  body::before,
+  body::after {
+    content: '';
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    height: 150px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
+  }
+  
+  body::before {
+    top: 0;
+    background-image: url('/storage/images/auth-top.jpg'); /* ✅ 上部画像パス */
+  }
+  
+  body::after {
+    bottom: 0;
+    background-image: url('/storage/images/auth-bottom.jpg'); /* ✅ 下部画像パス */
   }
   
   .container {
     max-width: 430px;
     width: 100%;
-    height: 100%;
-    padding: 20px;
+    padding: 160px 20px 160px; /* 上と下に余白を持たせる */
     box-sizing: border-box;
     z-index: 1;
-    position: relative;
-    background-color: transparent; /* 背景は画像を透かして見せる */
-    top:200px;
+    background-color: transparent;
+    text-align: center;
   }
   
-.title {
+  .title {
     font-size: 48px;
     color: #58c6ff;
     font-weight: bold;
     margin-bottom: 30px;
     text-shadow: 2px 2px 0 #b3e5ff;
-    text-align: center;
     font-family: 'Mochiy Pop One', sans-serif;
-    margin-top: -15%;
-}
-
-.subtitle {
-    font-size: 18px;
-    color: #6c63ff;
-    margin-bottom: 10px;
-    text-shadow: 0 0 8px rgba(108, 99, 255, 0.6);
-    text-align: center;
-}
-
-.subtitle-arc {
+  }
+  
+  .subtitle-arc {
     display: block;
-    margin-top: -15%;
-    margin:auto ;
-    
+    margin: 0 auto -20px;
   }
   
   .subtitle-text {
@@ -56,8 +67,7 @@ body {
     font-family: 'Rounded Mplus 1c', sans-serif;
   }
   
-
-.button {
+  .button {
     display: block;
     width: 80%;
     max-width: 300px;
@@ -69,24 +79,22 @@ body {
     text-decoration: none;
     border: 4px dotted;
     transition: all 0.3s ease;
-    text-align: center;
-}
-
-.btn-register {
     color: #555;
+  }
+  
+  .btn-register {
     border-color: #ff66cc;
-}
-
-.btn-login {
-    color: #555;
+  }
+  
+  .btn-login {
     border-color: #58c6ff;
-}
-
-.button:hover {
+  }
+  
+  .button:hover {
     opacity: 0.8;
     transform: translateY(-2px);
-}
-
+  }
+  
 
 /* .background {
     position: fixed;
