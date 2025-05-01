@@ -18,29 +18,21 @@
 
 </head>
 <body>
-    <div class="background">
-        <!-- 上部 -->
-        <div class="circle circle-top1 floating"></div>
-        <div class="circle circle-top2 pulse"></div>
-        <div class="circle circle-top3 floating-delay1"></div>
-        <div class="circle circle-top4 float-x"></div>
-        <div class="circle circle-top5 floating-delay2"></div>
-        <div class="circle circle-top6 pulse"></div>
-        <div class="circle circle-top7 float-x"></div>
-
-        <!-- 下部 -->
-        <div class="circle circle-bottom1 floating"></div>
-        <div class="circle circle-bottom2 pulse"></div>
-        <div class="circle circle-bottom3 floating-delay2"></div>
-        <div class="circle circle-bottom4 float-x"></div>
-        <div class="circle circle-bottom5 floating-delay1"></div>
-        <div class="circle circle-bottom6 pulse"></div>
-        <div class="circle circle-bottom7 float-x"></div>
-
-    </div>
-
+    
     <div class="container">
-        <div class="subtitle">ストックの記録は</div>
+        <!-- アーチ状サブタイトル -->
+        <svg width="280" height="100" viewBox="0 0 280 50" class="subtitle-arc">
+            <defs>
+            <path id="curve" d="M20,45 A120,40 0 0,1 260,45" />
+            </defs>
+            <text width="100%">
+            <textPath href="#curve" startOffset="50%" text-anchor="middle" class="subtitle-text">
+                ストックの記録は
+            </textPath>
+            </text>
+        </svg>
+  
+  
         <div class="title">ストログ</div>
         <a href="{{ route('register') }}" class="button btn-register">新規登録</a>
         <a href="{{ route('login') }}" class="button btn-login">ログイン</a>

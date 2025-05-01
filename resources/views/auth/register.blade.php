@@ -17,33 +17,11 @@
     
 </head>
 <body>
-    <div class="background">
-        <!-- 上部 -->
-        <div class="circle circle-top1 floating"></div>
-        <div class="circle circle-top2 pulse"></div>
-        <div class="circle circle-top3 floating-delay1"></div>
-        <div class="circle circle-top4 float-x"></div>
-        <div class="circle circle-top5 floating-delay2"></div>
-        <div class="circle circle-top6 pulse"></div>
-        <div class="circle circle-top7 float-x"></div>
-
-        <!-- 下部 -->
-        <div class="circle circle-bottom1 floating"></div>
-        <div class="circle circle-bottom2 pulse"></div>
-        <div class="circle circle-bottom3 floating-delay2"></div>
-        <div class="circle circle-bottom4 float-x"></div>
-        <div class="circle circle-bottom5 floating-delay1"></div>
-        <div class="circle circle-bottom6 pulse"></div>
-        <div class="circle circle-bottom7 float-x"></div>
-
-    </div>
-      
-    
-
-
-    <a href="{{ url('/') }}" class="back-btn">戻る</a>
+   
+   
 
     <div class="container">
+        <a href="{{ url('/') }}" class="back-btn">← 戻る</a>
         <h2>新規登録</h2>
         @if ($errors->any())
             <div style="color: red;">
