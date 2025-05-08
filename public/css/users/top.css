@@ -100,7 +100,6 @@ main {
     width: 100%;
     border: 2px solid hotpink;
     color: gray;
-    font-weight: bold;
     padding: 15px 24px;
     border-radius: 30px;
     margin-bottom: 18%;
@@ -125,7 +124,7 @@ main {
     align-items: center;
     justify-content: space-between;
     padding: 12px 0;
-    font-size: 16px;
+    font-size: 17px;
     overflow: hidden;
     background-color: white;
     transition: transform 0.3s ease;
@@ -133,8 +132,8 @@ main {
 
 /* ドットカラー */
 .category-dot {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     margin-right: 10px;
     flex-shrink: 0;
@@ -170,7 +169,7 @@ main {
     align-items: center;
     transform: translateX(100%); /* 最初は右外に隠す */
     transition: transform 0.3s ease;
-    font-weight: bold;
+    /* font-weight: bold; */
     border: none;
     cursor: pointer;
 }
@@ -227,7 +226,7 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-weight: bold;
+    /* font-weight: bold; */
     cursor: pointer;
 }
 
