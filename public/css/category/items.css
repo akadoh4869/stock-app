@@ -502,7 +502,7 @@ main {
 .footer-button {
     text-align: center;
     font-size: 14px;
-    color: #00aaff;
+    color: #666;
     text-decoration: none;
     pointer-events: auto;
 }
@@ -511,6 +511,7 @@ main {
     font-size: 26px;
     display: block;
     margin-bottom: 3px;
+    color: #00aaff;
 }
 
 /* ＋ボタン（右下） */

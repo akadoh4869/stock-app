@@ -1,6 +1,6 @@
 {
-    "name": "すとログ",
-    "short_name": "すとログ",
+    "name": "ストログ",
+    "short_name": "ストログ",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
