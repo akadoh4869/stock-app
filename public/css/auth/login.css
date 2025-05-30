@@ -51,7 +51,7 @@ body {
 .back-btn {
     position: absolute;
     top: 10px;
-    left: 5px;
+    left: 25px;
     font-size: 14px;
     color: #555;
     text-decoration: none;
@@ -127,4 +127,11 @@ button {
 
 button:hover {
     background-color: #3dc0d9;
+}
+
+@media screen and (max-width: 430px) {
+  /* スマホサイズのときだけ適用したいCSSをここに書く */
+  .back-btn {
+    left: 5px;
+  }
 }

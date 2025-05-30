@@ -43,7 +43,7 @@
                     </button>
                 </div>
             @else
-                <div style="max-width: 400px; margin: 0 auto;">
+                <div class="item-wrapper">
                     @foreach($items as $index => $item)
                         <div class="item-card" data-item='@json($item)' data-number="{{ $index + 1 }}">
 
@@ -146,7 +146,7 @@
         <div id="item-overlay" class="overlay" style="display: none;">
             <div class="overlay-content">
                 <div id="overlay-body"></div>
-                <button onclick="closeOverlay()" style="position: absolute; top: 10px; right: 10px; font-size: 20px;">✕</button>
+                <button class="edit-close" onclick="closeOverlay()">✕</button>
             </div>
         </div>
 

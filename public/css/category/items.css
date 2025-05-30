@@ -96,6 +96,11 @@ main {
     
 }
 
+.item-wrapper{
+    max-width: 400px;
+    margin: 0 auto;
+}
+
 .item-card {
     border: 2px solid #ff69b4;
     border-radius: 20px;
@@ -428,6 +433,7 @@ main {
     z-index: 9999;
 }
 .overlay-content {
+    border: 2px solid #5ce0f0;
     background: #fff;
     border-radius: 10px;
     padding: 20px;
@@ -538,6 +544,17 @@ main {
     border: none;
     color: white;
     border-radius: 25px;
+    cursor: pointer;
+}
+
+
+.edit-close{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
     cursor: pointer;
 }
 
@@ -654,6 +671,7 @@ textarea.styled-input {
     display: flex;
     justify-content: center;
 }
+
 
 .stock-add-button {
     background-color: #ff66cc;
@@ -805,3 +823,32 @@ textarea.styled-input {
     color: black;
 }
 
+@media screen and (max-width: 393px) {
+  /* スマホサイズのときだけ適用したいCSSをここに書く */
+  .item-wrapper{
+    max-width: 380px;
+    /* margin: 0 auto; */
+    }
+
+  .item-card {
+    padding: 16px;
+    margin-bottom: 15px;
+    
+}
+  
+}
+
+@media screen and (max-width: 376px) {
+  /* スマホサイズのときだけ適用したいCSSをここに書く */
+  .item-wrapper{
+    max-width: 360px;
+    /* margin: 0 auto; */
+    }
+
+  .item-card {
+    padding: 16px;
+    margin-bottom: 15px;
+    
+}
+  
+}
