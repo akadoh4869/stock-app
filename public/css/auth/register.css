@@ -50,7 +50,7 @@ body {
 .back-btn {
     position: absolute;
     top: 10px;
-    left: 5px;
+    left: 25px;
     font-size: 14px;
     color: #555;
     text-decoration: none;
@@ -131,3 +131,38 @@ button:hover {
     color: red;
     font-size: 13px;
 }
+
+@media screen and (max-width: 430px) {
+  /* スマホサイズのときだけ適用したいCSSをここに書く */
+  .back-btn {
+    left: 5px;
+  }
+}
+
+@media screen and (max-width: 376px) {
+  /* スマホサイズのときだけ適用したいCSSをここに書く */
+  body::before,
+  body::after {
+    height: 120px;
+  }
+
+  /* 見出し */
+    h2 {
+        font-size: 25px;
+        margin-top: 12%;
+    }
+
+    /* フォーム設定 */
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        align-items: center;
+        width: 100%;
+        margin-left: -5%;
+        /* margin-right: 15%; */
+    }
+    
+}
+
+
