@@ -359,22 +359,20 @@ document.addEventListener('DOMContentLoaded', function () {
         const file = event.target.files[0];
         if (!file) return;
 
-        const maxWidth = 1024; // 最大幅（適宜調整）
-        const maxHeight = 1024; // 最大高さ（適宜調整）
-        const quality = 0.7; // 圧縮品質（0〜1）
-
         const reader = new FileReader();
         reader.onload = function (e) {
             const img = new Image();
             img.onload = function () {
+                const maxDimension = 1280; // 最大幅または高さ（例: 1280px）
                 let width = img.width;
                 let height = img.height;
 
-                // サイズ調整（アスペクト比維持）
-                if (width > maxWidth || height > maxHeight) {
-                    const ratio = Math.min(maxWidth / width, maxHeight / height);
-                    width = width * ratio;
-                    height = height * ratio;
+                if (width > height && width > maxDimension) {
+                    height *= maxDimension / width;
+                    width = maxDimension;
+                } else if (height > maxDimension) {
+                    width *= maxDimension / height;
+                    height = maxDimension;
                 }
 
                 const canvas = document.createElement('canvas');
@@ -383,29 +381,43 @@ document.addEventListener('DOMContentLoaded', function () {
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // 圧縮されたBlobを取得して送信
-                canvas.toBlob(function (blob) {
-                    const formData = new FormData();
-                    formData.append('image', blob, file.name); // 圧縮済み画像
-                    formData.append('_token', csrfToken);
+                // Blobサイズをチェックしながら圧縮
+                function compressAndUpload(quality) {
+                    canvas.toBlob(blob => {
+                        if (blob.size <= 1024 * 1024 || quality <= 0.3) {
+                            // 1MB以下または最低品質に達したらアップロード
+                            const formData = new FormData();
+                            formData.append('image', blob, file.name);
+                            formData.append('_token', csrfToken);
 
-                    fetch(`/items/${itemId}/image`, {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => {
-                        if (!response.ok) throw new Error('画像アップロード失敗');
-                        return response.json();
-                    })
-                    .then(() => location.reload())
-                    .catch(error => alert(error.message));
-                }, 'image/jpeg', quality);
+                            fetch(`/items/${itemId}/image`, {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => {
+                                if (!response.ok) throw new Error('画像アップロード失敗');
+                                return response.json();
+                            })
+                            .then(() => location.reload())
+                            .catch(error => alert(error.message));
+                        } else {
+                            // サイズが大きい場合、さらに圧縮して再試行
+                            compressAndUpload(quality - 0.1);
+                        }
+                    }, 'image/jpeg', quality);
+                }
+
+                compressAndUpload(0.8); // 初期圧縮品質
             };
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
     }
 });
+
+
+   
+
 
 
     // アイテム削除
