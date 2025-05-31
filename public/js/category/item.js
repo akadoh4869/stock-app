@@ -129,6 +129,8 @@ document.addEventListener('DOMContentLoaded', function () {
     
             formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
     
+            const imageInput = formBox.querySelector('input[name="image"]');
+            const file = imageInput?.files[0]; // ← これが必要！
             // fetch(window.itemStoreUrl, {
             //     method: 'POST',
             //     body: formData
