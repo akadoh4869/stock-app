@@ -25,6 +25,51 @@ function confirmDelete(itemCount) {
     }
 }
 
+function openEditModal(id, name) {
+    // スワイプ解除
+    const item = document.querySelector(`.category-item[data-id='${id}']`);
+    item.classList.remove('swiped');
+
+    // モーダル処理
+    document.getElementById('editCategoryId').value = id;
+    document.getElementById('editCategoryName').value = name;
+    document.getElementById('editModal').style.display = 'block'; // ← flexに注意
+}
+
+
+function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+
+function submitEdit() {
+    const id = document.getElementById('editCategoryId').value;
+    const name = document.getElementById('editCategoryName').value;
+
+    fetch(`/category/update-name/${id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ name: name })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // 画面上の名前を更新
+            const item = document.querySelector(`.category-item[data-id='${id}']`);
+            if (item) {
+                item.querySelector('.category-content a').textContent = name;
+            }
+            closeEditModal();
+        } else {
+            alert('更新に失敗しました。');
+        }
+    })
+    .catch(() => alert('通信エラーが発生しました。'));
+}
+
+
 function closeInvitationPopup() {
     const popupOverlay = document.getElementById('invitation-popup-overlay');
     const invitationIds = [...document.querySelectorAll('#close-popup-form input[name="invitation_ids[]"]')].map(input => input.value);

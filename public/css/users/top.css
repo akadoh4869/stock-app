@@ -155,34 +155,104 @@ main {
     margin-left: auto;
 }
 
-/* 削除ボタン */
-.delete-btn {
+/* 編集＋削除の親コンテナ */
+.action-buttons {
     position: absolute;
     top: 0;
     right: 0;
-    width: 80px;
+    display: flex;
+    height: 100%;
+    padding: 0 5px;
+    transform: translateX(100%); /* ← 右に隠す */
+    transition: transform 0.3s ease;
+    pointer-events: none;
+    opacity: 0;
+    font-size: 14px;
+}
+
+/* スワイプ時：表示 */
+.category-item.swiped .action-buttons {
+    transform: translateX(0px);
+    pointer-events: auto;
+    opacity: 1;
+}
+
+/* 編集ボタン */
+.edit-btn {
+    width: 40px;
+    height: 75%;
+    background-color: #007bff;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* 削除ボタン */
+.delete-btn {
+    width: 40px;
     height: 75%;
     background-color: red;
     color: white;
     display: flex;
     justify-content: center;
     align-items: center;
-    transform: translateX(100%); /* 最初は右外に隠す */
-    transition: transform 0.3s ease;
-    /* font-weight: bold; */
     border: none;
     cursor: pointer;
 }
 
-/* スワイプ時：リスト本体を左にずらす（ボタンの幅分） */
-.category-item.swiped {
-    transform: translateX(-10px); /* ←ここ！左に80pxずらす */
+.category-content {
+    transition: transform 0.3s ease;
+    will-change: transform;
 }
 
-/* スワイプ時：削除ボタンを出す */
-.category-item.swiped .delete-btn {
-    transform: translateX(0);
+.category-item.swiped .category-content {
+    transform: translateX(0px); /* 編集(80px) + 削除(80px) */
 }
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;  /* 横中央 */
+    align-items: center;      /* 縦中央 */
+    z-index: 1000;
+}
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+}
+
+/* モーダル本体に position: relative を追加 */
+.modal-content {
+    position: relative; /* ← これ重要 */
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 300px;
+    max-width: 90%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
+
 
 #category-form{
     margin-left: -6%;
