@@ -122,27 +122,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (el?.value) formData.append(field, el.value);
             });
     
-            // const imageInput = formBox.querySelector('input[name="image"]');
-            // if (imageInput?.files[0]) {
-            //     formData.append('image', imageInput.files[0]);
-            // }
-    
             formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
     
             const imageInput = formBox.querySelector('input[name="image"]');
             const file = imageInput?.files[0]; // ← これが必要！
-            // fetch(window.itemStoreUrl, {
-            //     method: 'POST',
-            //     body: formData
-            // })
-            // .then(res => {
-            //     if (!res.ok) throw new Error('サーバーエラー');
-            //     return res.json();
-            // })
-            // .then(() => {
-            //     location.reload();
-            // })
-            // .catch(err => alert('保存失敗: ' + err.message));
             const maxDimension = 1280;
             const quality = 0.8;
 

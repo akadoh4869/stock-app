@@ -94,7 +94,9 @@ Route::middleware(['auth'])->group(function () {
     // Route::post('/items/{item}/image-upload', [StockController::class, 'uploadImage'])->name('item.image.upload');
 
     // web.php
-    Route::post('/category/update/{id}', [CategoryController::class, 'updateName']);
+    Route::post('/category/update-name/{id}', [CategoryController::class, 'updateName'])->name('category.updateName');
+
+    // Route::post('/category/update/{id}', [CategoryController::class, 'updateName']);
 
     Route::get('/category/bulk-create', [CategoryController::class, 'bulkCreate'])->name('category.bulkCreate');
 

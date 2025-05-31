@@ -104,14 +104,21 @@
                             <span class="category-count">（{{ $category->items->count() }}）</span>
                         </div>
 
-                        <!-- 削除ボタン -->
-                        <form method="POST" action="{{ route('category.destroy', $category->id) }}"
-                            onsubmit="return confirmDelete({{ $category->items->count() }})">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="delete-btn">削除</button>
-                        </form>
-                    </li>     
+                        <!-- 編集・削除ボタンコンテナ -->
+                        <div class="action-buttons">
+                            <!-- 編集ボタン -->
+                            <button class="edit-btn" onclick="openEditModal({{ $category->id }}, '{{ $category->name }}')">編集</button>
+
+                            <!-- 削除ボタン -->
+                            <form method="POST" action="{{ route('category.destroy', $category->id) }}"
+                                onsubmit="return confirmDelete({{ $category->items->count() }})">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="delete-btn">削除</button>
+                            </form>
+                        </div>
+
+                    </li>    
                     @endforeach
                 </ul>
             @endif
@@ -222,6 +229,22 @@
         <br>
         <br>
     </main>
+
+    <!-- 編集モーダル -->
+    <div id="editModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h4>カテゴリ名を編集</h4>
+            <!-- 閉じるボタン -->
+            <button class="close-button" onclick="closeEditModal()">×</button>
+
+           
+            <input type="text" id="editCategoryName" />
+            <input type="hidden" id="editCategoryId" />
+            <button onclick="submitEdit()">保存</button>
+        </div>
+    </div>
+
+
 
     <!-- CDN読み込み（Echo & Pusher） -->
     <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
